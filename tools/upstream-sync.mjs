@@ -42,7 +42,9 @@ const OURS = [
 const WATCHED_PKG_FIELDS = ['dependencies', 'peerDependencies', 'optionalDependencies', 'exports', 'files', 'dsh', 'main', 'type']
 
 const git = (...args) => execFileSync('git', args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim()
-const tryGit = (...args) => { try { return { ok: true, out: git(...args) } } catch (e) { return { ok: false, out: String(e.stderr || e.message) } } }
+const tryGit = (...args) => {
+  try { return { ok: true, out: git(...args) } } catch (e) { return { ok: false, out: `${e.stdout || ''}\n${e.stderr || ''}\n${e.message}` } }
+}
 const isOurs = (p) => OURS.some((re) => re.test(p))
 
 function output(result) {
