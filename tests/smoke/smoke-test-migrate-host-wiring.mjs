@@ -113,7 +113,7 @@ console.log('\n[H5] 一键更新：必须关 pnpm 供应链闸门 + 装后复核
   const seg = i > 0 ? ix.slice(i, i + 3000) : ''
   ok(/--config\.minimumReleaseAge=0/.test(seg), 'H5b pnpm 分支显式关闭供应链闸门（Release Age）')
   ok(/--min-release-age=0/.test(seg), 'H5c npm 分支同样关闭闸门')
-  ok(/dsh-auto-memory' \+ \(target \? '@' \+ target : '@latest'\)/.test(seg) || /const spec = '@a9i5k4\/dsh-auto-memory'/.test(seg),
+  ok(/dsh-personalised' \+ \(target \? '@' \+ target : '@latest'\)/.test(seg) || /const spec = 'dsh-personalised/.test(seg),
     'H5d 命令钉死具体目标版本（不再裸 @latest）')
   ok(/landedVersion/.test(seg), 'H5e 装后读回真实版本（后续失败分支要用）')
   ok(/landed !== want/.test(seg), 'H5f 版本不符即判失败（不再谎报成功）')

@@ -117,7 +117,7 @@ t('M8 legacy 默认零行为: 两咽喉与 sidecar 的档位闸门(graphEnabled=
   assert.ok(src.includes("boardMode: 'graph'"), 'DEFAULT_CONFIG 默认 graph(3.0.0 起)')
 })
 
-t('M9 P3 两工具条件注册 + 工具数闸门(legacy 17 / graph 19)', async () => {
+t('M9 P3 两工具条件注册 + 工具数闸门(legacy 18 / graph 20，新增 memory_profile)', async () => {
   const src = await readFile('lib/index.js', 'utf8')
   // ★2026-09-16 修 BUG-15 后语式变更: 两个 defineTool 现在被 `tools.push(...)` 包裹
   // (此前漏了 push, 返回值被丢弃 ⇒ 闸门打开也不会注册)。断言必须写「真实调用形态」:
@@ -132,11 +132,11 @@ t('M9 P3 两工具条件注册 + 工具数闸门(legacy 17 / graph 19)', async (
   // ★ T4(2026-09-19): 16 → 17(新增 memory_procedure, 无条件注册)。
   for (const f of ['tests/smoke/smoke-test.mjs', 'tests/smoke/smoke-test-m3b3.mjs', 'tests/smoke/smoke-test-context-observer.mjs']) {
     const s = await readFile(f, 'utf8')
-    assert.ok(/!==\s*19/.test(s), f + ' 默认档已翻 graph ⇒ 工具数硬锁应为 19(含 T4 memory_procedure + P9 memory_rules + M8-B memory_procedure_list)')
+    assert.ok(/!==\s*20/.test(s), f + ' 默认档已翻 graph ⇒ 工具数硬锁应为 20(19 legacy + dsh-personalised memory_profile)')
   }
   // graph 档 17 的断言在 smoke-test-graph-mode-pre.mjs
   const g = await readFile('tests/smoke/smoke-test-graph-mode.mjs', 'utf8')
-  assert.ok(/!==\s*19/.test(g) || /=== *19/.test(g), 'graph 档工具数 19 有独立断言')
+  assert.ok(/!==\s*20/.test(g) || /=== *20/.test(g), 'graph 档工具数 20 有独立断言（含 memory_profile）')
 })
 
 t('M10 GUI 一键切换: 设置页与接续面板双入口, 同一配置键 boardMode, 默认档旧行为', async () => {

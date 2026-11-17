@@ -287,14 +287,19 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
 // ---------- C8 prompt 零变化 ----------
 {
   const h = globalThis.__h
-  ok(h.promptComponents.length === 3, 'C8 注册组件=section+context+m6 尾注面(n=' + h.promptComponents.length + ')')
+  // dsh-personalised 接线新增 instructions(Prompt G) 与 personal(P/W) 两个宿主面；这里锁清单而非注入内容，避免把新功能误判为 M5 破坏。
+  ok(h.promptComponents.length === 5, 'C8 注册组件=section+context+m6 尾注面+dsh-personalised G/PW(n=' + h.promptComponents.length + ')')
+  const registeredNamesBefore = h.promptComponents.map((component) => String(component.name || ''))
+  ok(registeredNamesBefore.includes('dsh-personalised:instructions'), 'C8 已注册稳定 G section')
+  ok(registeredNamesBefore.includes('dsh-personalised:personal'), 'C8 已注册动态 P/W context')
   // ★命名空间「齐一」而不是「必须带 -pre」：发布线用裸名、pre 开发树用 -pre，由 release.mjs 转换表统一改写。
   //   真正要防的是同一进程里混用两种名字（混用会让组件去重/覆盖判据失效）⇒ 断言齐一。
   {
     const names = h.promptComponents.map((c) => String(c.name || ''))
-    const withPre = names.filter((n) => n.includes('-pre')).length
-    ok(withPre === 0 || withPre === names.length,
-      'C8 prompt 组件命名空间齐一（全裸名或全 -pre，实得 ' + withPre + '/' + names.length + ' 带 -pre）')
+    const upstreamNames = names.filter((name) => !name.startsWith('dsh-personalised:'))
+    const withPre = upstreamNames.filter((name) => name.includes('-pre')).length
+    ok(withPre === 0 || withPre === upstreamNames.length,
+      'C8 上游 prompt 组件命名空间齐一（个性化 G/PW 使用稳定裸名；上游全裸或全 -pre，实得 ' + withPre + '/' + upstreamNames.length + ' 带 -pre）')
   }
   const ctxObj = { agent: h.agent }
   const textsBefore = h.promptComponents.map((c) => (typeof c.text === 'function' ? String(c.text(ctxObj)) : ''))
@@ -309,8 +314,8 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
   //   且会让任何真的投递了唤回块的实现必红 —— 它把「唤回面存在」误判成「M5 改了 prompt」。
   //   「M5 不改 prompt」由上面两条守住：①组件注册集合不变（见上方 C8 首条断言）
   //   ②静态 section 段逐字节不变（前缀缓存锚语义保真）。
-  ok(h.promptComponents.length === 3,
-    'C8 开启后组件注册集合不变（prompt 面数量守恒 n=' + h.promptComponents.length + '）')
+  ok(h.promptComponents.length === registeredNamesBefore.length && h.promptComponents.map((component) => String(component.name || '')).join('|') === registeredNamesBefore.join('|'),
+    'C8 开启后组件注册集合不变（prompt 面数量守恒 n=' + h.promptComponents.length + '；包含 dsh-personalised G/PW）')
   console.log('[C8] prompt/section/context 零变化')
 }
 

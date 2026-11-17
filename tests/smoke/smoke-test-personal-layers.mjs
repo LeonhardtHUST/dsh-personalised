@@ -110,7 +110,7 @@ console.log('[D3] renderPersonalContext：P/W 归属 / pending 与跨工作区�
     entry('w4', { scope: { type: 'workspace', key: OWN_WS, path: 'C:\\work\\demo' }, kind: 'pending', category: 'pending', text: '本项目截止时间待确认。' }),
     entry('w5', { scope: { type: 'workspace', key: OWN_WS, path: 'C:\\work\\demo' }, kind: 'fact', evidence: 'unconfirmed', text: '别注入这条未确认的项目信息。' }),
   ]
-  const out = renderPersonalContext({ query: '项目迁移 PowerShell', entries, wsKey: OWN_WS, topK: 8, budgetChars: 1600 })
+  const out = renderPersonalContext({ query: '项目迁移 PowerShell 对比表', entries, wsKey: OWN_WS, topK: 8, budgetChars: 1600 })
   ok(out.text.includes('<personal_memory>') && out.text.includes('</personal_memory>'), 'P 段有 personal_memory 包裹')
   ok(out.text.includes('<workspace_memory>') && out.text.includes('</workspace_memory>'), 'W 段有 workspace_memory 包裹')
   ok(out.text.includes('项目 A 正在迁移到 rc3。'), 'global fact 进 P 层')
@@ -123,7 +123,7 @@ console.log('[D3] renderPersonalContext：P/W 归属 / pending 与跨工作区�
   ok(out.personal.length + out.workspace.length <= 1600, 'P+W 正文不超预算')
   eq(out.counts.workspace, 2, 'W 命中 2 条')
   ok(out.personal.split('\n')[0].includes('项目 A'), '相关度高的条目在前')
-  eq(renderPersonalContext({ query: '项目迁移 PowerShell', entries, wsKey: OWN_WS }), out, '同输入两次逐字节一致')
+  eq(renderPersonalContext({ query: '项目迁移 PowerShell 对比表', entries, wsKey: OWN_WS }), out, '同输入两次逐字节一致')
 
   const noWs = renderPersonalContext({ query: '项目', entries, wsKey: null })
   eq([noWs.workspace, noWs.text.includes('<workspace_memory>')], ['', false], '没有 wsKey → W 层为空')

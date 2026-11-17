@@ -71,8 +71,8 @@ console.log("=== T2 适配层真执行：0.2.x（提供 startActivation）===")
   ok(seenSpec && seenSpec.provider === "spawn", "spec.provider 正确")
   ok(seenSpec && seenSpec.label === "L", "spec.label 正确")
   ok(seenSpec && seenSpec.delivery === "parent", "spec.delivery='parent'（照抄官方工具）")
-  ok(seenSpec && seenSpec.request && Array.isArray(seenSpec.request.prompt), "request.prompt 为数组")
-  ok(seenSpec && seenSpec.request.parent && seenSpec.request.parent.session.id === "s", "request.parent 透传")
+  ok(seenSpec && Array.isArray(seenSpec.prompt), "request.prompt 为数组")
+  ok(seenSpec && seenSpec.parent && seenSpec.parent.session.id === "s", "request.parent 透传")
 }
 
 // ── T3 适配层：0.1.x 兼容分支 ─────────────────────────────────────

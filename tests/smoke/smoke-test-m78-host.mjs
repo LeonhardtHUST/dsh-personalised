@@ -120,7 +120,7 @@ console.log('[P2] child-session 抑制不建 envelope;plugin-generated 抑制')
   const h = await setupHarness()
   // 2026-08-26 裁定 contextBridgeObserveChildSessions 默认 true;本场景专测关闭态抑制,须显式关
   await h.cfgPost({ associativeMemoryEnabled: true, contextBridgeEnabled: true, pythonBackendEnabled: true, contextSinkMode: 'python', contextBridgeObserveChildSessions: false })
-  const childAgent = { id: 'c1', session: { id: 'sc1', header: { id: 'sc1', cwd: h.wsA, parentSession: 's1' } } }
+  const childAgent = { id: 'c1', session: { id: 'sc1', header: { id: 'sc1', cwd: h.wsA, parentSession: 's1', origin: 'subagent', delegationDepth: 1 } } }
   await h.fire('agent/session-start', { agent: childAgent, source: 'child' })
   await sleep(150)
   await h.fire('session/event', childAgent.session, { type: 'user/message', seq: 300, time: Date.now(), data: { role: 'user', content: [{ type: 'text', text: '子代理输入 部署流程' }] } })

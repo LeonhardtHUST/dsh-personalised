@@ -193,9 +193,10 @@ console.log('[F7/F8] section 字节稳定 / 尾注不进 section / 关闭恢复'
   // ★同 m53-C8：断言「命名空间齐一」而不是「必须带 -pre」（发布线裸名 / pre 树 -pre，由转换表统一改写）
   {
     const names = [sectionComp, ...ctxComps].map((c) => String((c && c.name) || ''))
-    const withPre = names.filter((n) => n.includes('-pre')).length
-    ok(names.every(Boolean) && (withPre === 0 || withPre === names.length),
-      'F7 section/context 组件命名空间齐一（实得 ' + withPre + '/' + names.length + ' 带 -pre）')
+    const upstreamNames = names.filter((name) => !name.startsWith('dsh-personalised:'))
+    const withPre = upstreamNames.filter((n) => n.includes('-pre')).length
+    ok(names.every(Boolean) && (withPre === 0 || withPre === upstreamNames.length),
+      'F7 上游 section/context 命名空间齐一（个性化 G/PW 使用稳定裸名；上游实得 ' + withPre + '/' + upstreamNames.length + ' 带 -pre）')
   }
   const secBefore = String(sectionComp.text({}))
   await h.cfgPost({ activationInboxEnabled: false, associativeMemoryEnabled: false })

@@ -198,8 +198,19 @@ try {
     eq(mergeItem.entry.scope.key, WS_KEY, 'workspace key 正确')
     eq(preview.report.summary, '模型整理完成', '模型 report.summary 透传')
     eq(preview.report.conflicts, '1 条冲突', '模型 report.conflicts 透传')
-    eq(preview.report.notes.length, 1, '档案说明性段落进 report.notes')
     ok(!preview.report.notes[0].includes('**'), '说明性段落文本已清洗（无 Markdown 星号）')
+    const pendingImporter = createImporter({ store: makeStore(), llmCall: async () => ({ text: JSON.stringify({ entries: [
+      { ref: 'n2', category: 'identity', evidence: 'explicit', text: '模型试图升级待确认', scope: 'global', action: 'add' },
+      { category: 'identity', evidence: 'explicit', text: '无 ref 的模型事实', action: 'add' },
+    ] }) }), now })
+    const pendingPreview = await pendingImporter.preview({ text: '### 9. 待确认与信息缺口\n[待确认] 原档案待核实事项。', mode: 'model', provider: 'p', model: 'm' })
+    eq(pendingPreview.items[0].entry.category, 'pending', '原档案 pending 分类不可被模型升级')
+    eq(pendingPreview.items[0].entry.evidence, 'unconfirmed', '原档案待确认证据不可被模型升级')
+    ok(pendingPreview.items[0].reason.includes('原档案标为待确认'), 'pending 保留原因写入预览')
+    eq(pendingPreview.items[1].entry.evidence, 'inferred', '无有效 ref 的模型 evidence 最高为 inferred')
+    const workspaceImporter = createImporter({ store: makeStore(), llmCall: async () => ({ text: JSON.stringify({ entries: [{ ref: 'n1', category: 'identity', text: '显式工作区目标', scope: 'global', action: 'add' }] }) }), now })
+    const workspacePreview = await workspaceImporter.preview({ text: '- 普通档案条目。', mode: 'model', provider: 'p', model: 'm', workspace: { key: WS_KEY, path: WS_PATH }, scopePreference: 'workspace' })
+    eq(workspacePreview.items[0].entry.scope.type, 'workspace', '用户显式 workspace 目标覆盖模型 global scope')
   }
 
   console.log('[I4] model 模式：非法 JSON 降级 parse + warning；调用失败 502；无模型 400')

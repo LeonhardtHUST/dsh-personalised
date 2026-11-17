@@ -90,9 +90,9 @@ console.log('[R3] selectRelevant：相关性排序 / pending 排除 / 预算 / t
   const filtered = selectRelevant({ query: '项目 A 迁移', entries: ENTRIES, minScore: 999 })
   eq(filtered.items, [], 'minScore 高于所有分数 → 无相关条目')
   const noQuery = selectRelevant({ query: '', entries: ENTRIES, minScore: 999 })
-  ok(noQuery.items.length > 0, 'query 为空时忽略 minScore（退化排序而不是不注入）')
-  eq(noQuery.items[0].entry.id, 'pm_a', '退化排序按优先级：high 在前')
-  eq(noQuery.items.map((item) => item.entry.id), ['pm_a', 'pm_b', 'pm_d'], '退化排序稳定（高→中→低）')
+  eq(noQuery.items, [], 'query 为空时只注入置顶条目（无置顶则为空）')
+  eq(selectRelevant({ query: 'banana astronomy', entries: [mk('pm_pg', 'PostgreSQL deployment workflow')] }).items, [], 'query 非空时排除零分条目')
+  eq(selectRelevant({ query: '', entries: [mk('pm_pin', 'PostgreSQL deployment workflow', { pinned: true })] }).items.map((item) => item.entry.id), ['pm_pin'], 'query 为空时仍保留置顶条目')
 
   const pinnedEntries = ENTRIES.map((entry) => (entry.id === 'pm_b' ? { ...entry, pinned: true, text: '与主题无关但已置顶' } : entry))
   const pinned = selectRelevant({ query: '项目 A', entries: pinnedEntries, minScore: 999 })

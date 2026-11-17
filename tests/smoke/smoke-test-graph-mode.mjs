@@ -86,11 +86,11 @@ console.log('=== WB-GRAPH graph 档端到端 ===')
 // A. graph 档: 工具数 14 → 16, 两个遍历工具**真的注册**(修 BUG-1/11 的验收)
 // ─────────────────────────────────────────────────────────────
 const bg = bootPre('graph')
-t('A1 graph 档工具数 = 19(13 旧 + 2 遍历 + 1 ? + T4 + P9 + M8-B) —— 断言「至少含两遍历工具」且计数一致', () => {
+t('A1 graph 档工具数 = 20（19 legacy + 1 memory_profile + 2 遍历，计数一致）—— 断言「至少含两遍历工具」', () => {
   const names = bg.tools.map((x) => x.name)
   assert(names.includes('memory_expand'), 'graph 档必须注册 memory_expand(修 BUG-1: 此前闸门恒假, 永不注册)')
   assert(names.includes('memory_trace'), 'graph 档必须注册 memory_trace')
-  assert(bg.tools.length === 19, 'graph 档工具数应为 19, 实为 ' + bg.tools.length + ': ' + names.join(','))
+  assert(bg.tools.length === 20, 'graph 档工具数应为 20（19 legacy + dsh-personalised memory_profile）, 实为 ' + bg.tools.length + ': ' + names.join(','))
 })
 t('A2 两遍历工具契约完整(parameters.id/tag + execute 是函数)', () => {
   const ex = bg.tools.find((x) => x.name === 'memory_expand')
@@ -213,11 +213,11 @@ t('C1 BUG-10 write/rebuild 两路径 id 一致(正/反斜杠 + title 前缀差�
 // ─────────────────────────────────────────────────────────────
 // ★ T4(2026-09-19): 14→15 / 16→17 —— memory_procedure **无条件注册**(不属白板 P3 闸门),
 //   故 legacy 与 graph 两档同时 +1;本节断言的**意图**(legacy ≠ graph, 证明闸门真的在起作用)不变。
-t('D1 legacy 档工具数 = 17(与 graph 档 19 形成对照, 证明闸门真的在起作用)', () => {
+t('D1 legacy 档工具数 = 18（17 legacy + memory_profile；与 graph 档 20 形成对照）', () => {
   const bl = bootPre('legacy')
   try {
     const names = bl.tools.map((x) => x.name)
-    assert(bl.tools.length === 17, 'legacy 档必须仍为 17 工具(15 + T4 memory_procedure + P9 memory_rules + M8-B memory_procedure_list), 实为 ' + bl.tools.length)
+    assert(bl.tools.length === 18, 'legacy 档应为 18 工具（17 legacy + dsh-personalised memory_profile）, 实为 ' + bl.tools.length)
     assert(!names.includes('memory_expand'), 'legacy 档不得注册 memory_expand')
     assert(!names.includes('memory_trace'), 'legacy 档不得注册 memory_trace')
     // T4 工具**不属**白板闸门 ⇒ legacy 档也必须在场(反向保证:别把它错当 graph-only)
@@ -225,10 +225,10 @@ t('D1 legacy 档工具数 = 17(与 graph 档 19 形成对照, 证明闸门真的
     assert(names.includes('memory_procedure_list'), 'legacy 档也必须注册 memory_procedure_list(只读浏览同样不受 boardMode 闸门管)')
   } finally { cleanup(bl) }
 })
-t('D2 非法档位值 fail closed → legacy(17), 绝不猜 graph', () => {
+t('D2 非法档位值 fail closed → legacy(18), 绝不猜 graph', () => {
   const bx = bootPre('bogus-mode')
   try {
-    assert(bx.tools.length === 17, '非法值必须回落 legacy(17), 实为 ' + bx.tools.length)
+    assert(bx.tools.length === 18, '非法值必须回落 legacy(18), 实为 ' + bx.tools.length)
   } finally { cleanup(bx) }
 })
 
