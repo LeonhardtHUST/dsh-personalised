@@ -1,0 +1,7 @@
+# pnpm 12 默认 strictDepBuilds=true，未批准的依赖构建脚本会让 install 直接失败。
+# 这三个都来自可选依赖 @huggingface/transformers（本地语义检索用），显式批准它们的
+# 构建脚本，pnpm install / vp install 才能干净退出。
+allowBuilds:
+  onnxruntime-node: true
+  protobufjs: true
+  sharp: true

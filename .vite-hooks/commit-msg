@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+# commit-msg 钩子：用 commitlint 校验提交信息（Angular 约定，subject 必须含汉字）。
+# vp hooks 分发器会以 `sh -e` 执行本脚本，并把提交信息文件路径作为第一个参数传入；
+# 执行前它已把 node_modules/.bin 放在 PATH 最前面，所以这里的 vp 就是项目本地 CLI。
+exec vp exec commitlint --edit "$1"

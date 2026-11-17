@@ -1,5 +1,9 @@
 node_modules/
 *.log
+
+# vp 生成的 Git hook 分发器（vp hooks enable / vp config 会重建），项目自己的钩子
+# 脚本 .vite-hooks/commit-msg 则必须入库。
+.vite-hooks/_/
 .dsh-memory/
 .DS_Store
 
@@ -31,7 +35,7 @@ artifacts/release-c2-asset-pack/*.tgz
 
 # 含个人记忆的隔离扫描截图,禁止提交/上传(handoff 规定)
 artifacts/pr146-native-ui/operations-外部来源.png
-artifacts/pr146-native-ui/host.pid
+artifacts/pr146-native-ui/host.pid
 
 # --- 2026-10-01 补漏（issue #166）：源码副本/调试残留 ---
 # 3.2.6 曾把 7 份 client.js 调试残留发上 npm（约 14.97 MB）：它们不含 bak，

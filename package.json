@@ -2,7 +2,18 @@
   "name": "@a9i5k4/dsh-auto-memory",
   "description": "Proactive associative memory for DSH: zero-prompt recall injected before the model speaks, three-layer auto-consolidation, skill crystallization, and Astra-style context management - handoff ledgers, PLAN whiteboard, water-level sensing. Local-first, model-agnostic, zero deps. 主动联想记忆+Astra 式上下文管理:自动唤回/自动沉淀/技能固化/交接账本与白板跨窗口续命/水位感知。",
   "version": "3.3.17",
+  "packageManager": "pnpm@12.21.0",
+  "engines": {
+    "node": ">=24.9.0"
+  },
   "type": "module",
+  "scripts": {
+    "prepare": "vp config --no-agent",
+    "test": "node tools/run-smoke.mjs",
+    "commitlint": "commitlint --edit",
+    "hooks:enable": "vp hooks enable",
+    "hooks:status": "vp hooks status"
+  },
   "main": "lib/index.js",
   "icon": "./icon.svg",
   "exports": {
@@ -58,5 +69,10 @@
   "optionalDependencies": {
     "@huggingface/transformers": "^3.7.6"
   },
-  "license": "BSD-3-Clause"
+  "license": "BSD-3-Clause",
+  "devDependencies": {
+    "@commitlint/cli": "^21.2.4",
+    "@commitlint/config-angular": "^21.2.4",
+    "vite-plus": "^1.6.0"
+  }
 }
