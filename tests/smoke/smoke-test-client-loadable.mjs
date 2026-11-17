@@ -139,7 +139,9 @@ ok(real.logs.filter((l) => l[0] === 'error').length === 0, '顶栏无 console.er
 
 console.log('== 2. 拿到 __ModuleLoader__ 注册项 ==')
 ok(!!real.entry, '__ModuleLoader__.load 被调用')
-ok(real.entry && real.entry.id === '@a9i5k4/dsh-auto-memory', 'id 正确')
+// ★R2026-11-17：包与模块 id 已由 @a9i5k4/dsh-auto-memory 改为 dsh-personalised
+//   （客户端 module id 必须等于包名，宿主才认得到；plugins.detail.section 仍兼容旧名认领）。
+ok(real.entry && real.entry.id === 'dsh-personalised', 'id 正确')
 ok(real.entry && typeof real.entry.factory === 'function', 'factory 是函数')
 
 console.log('== 3. ★真调用 factory（本命门：当初就是这里抛 ReferenceError） ==')

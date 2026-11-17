@@ -45,8 +45,17 @@ function extractFn(src, header) {
 const bodyOf = (src, header) => extractFn(src, header)
 
 // —— G1:客户端模块自身导出声明 remote/remote.session ——
-ok(SRC.includes("exports.inject = ['slots', 'sessions', 'remote', 'remote.session']"),
-  'G1 exports.inject declares remote + remote.session (06fbd10)')
+// ★R2026-11-17：同一行追加 'locale'（rc3 审计 P2-4 —— apply 一进来就读 ctx.locale.getLocale() 定界面语言，
+//   不在模块自身 inject 里声明会先于 locale 服务就绪被 apply ⇒ 语言回落中文，要等 locale/change 才纠正）。
+//   判据意图不变：声明必须写在**模块自身**的 exports.inject 上（06fbd10 的教训：只加 package.json dsh.client.inject 不够）。
+//   改成集合判定而非整行字面量 —— 以后再加服务（如 theme）不必再动这里，但四个既有名字一个都不许少。
+{
+  const decl = /exports\.inject = \[([^\]]*)\]/.exec(SRC)
+  ok(!!decl, 'G1 exports.inject 是数组字面量')
+  const names = decl ? decl[1].split(',').map((s) => s.trim().replace(/^'|'$/g, '')).filter(Boolean) : []
+  ok(['slots', 'sessions', 'remote', 'remote.session', 'locale'].every((n) => names.indexOf(n) >= 0),
+    'G1 exports.inject declares remote + remote.session + locale (06fbd10; R2026-11-17 locale)')
+}
 
 // —— G2:真实抽取 extractSessionId 并驱动 ——
 const extractSessionId = new Function('return (' + extractFn(SRC, 'function extractSessionId(created) {') + ')')()
