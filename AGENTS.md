@@ -42,7 +42,7 @@
 
 ## 发版
 
-- 改 `package.json` 的 `version` 并在 `CHANGELOG.md` 写同版本条目，推到 main 后 `release.yml` 自动测试、发布（npm trusted publishing）、打 tag、建 Release。
+- 改 `package.json` 的 `version` 并在 `CHANGELOG.md` 写同版本条目，推到 main 后 `publish.yml` 自动测试、发布（npm trusted publishing）、打 tag、建 Release。
 - 本地不要 `npm publish`，除非 CI 不可用且维护者明确要求。
 - `upstream-sync.yml` 每天合并上游；无法自动合并时会开 `upstream-sync` issue。处理方式见该 issue 内的说明。
 

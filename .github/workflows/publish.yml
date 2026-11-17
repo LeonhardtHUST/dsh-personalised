@@ -1,11 +1,11 @@
-name: release
+name: publish
 
 # package.json 的 version 变化并推到 main 后自动发版：
 #   1. 若 npm 上已有该版本，跳过。
 #   2. 跑全量 smoke。
 #   3. 用 npm trusted publishing（OIDC，无需 NPM_TOKEN）发布，附 provenance。
 #   4. 打 tag v<version> 并创建 GitHub Release。
-# trusted publisher 已在 npmjs.com 绑定本仓库的 release.yml；改文件名需同步更新 npm 上的配置。
+# trusted publisher 已在 npmjs.com 绑定本仓库的 publish.yml；改文件名需同步更新 npm 上的配置。
 # 发布用 npm CLI 而不是 vp pm publish：OIDC trusted publishing 由 npm CLI 实现。
 
 on:
@@ -18,7 +18,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: release
+  group: publish
   cancel-in-progress: false
 
 jobs:
