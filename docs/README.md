@@ -1,25 +1,33 @@
-# 文档目录
+# 文档索引
 
-## 安装、使用与开发
+## 用户文档
 
 | 文档 | 内容 |
 |---|---|
-| [用户指南](USER-GUIDE.zh-CN.md) / [English guide](USER-GUIDE.en.md) | 安装、功能入口与设置 |
-| [接手手册](HANDBOOK.md) | 启动、测试、数据位置与排障 |
-| [源码速查](SOURCE-REFERENCE.md) | 常用默认值，以及完整配置和接口的源码入口 |
-| [白皮书](WHITEPAPER.md) | 存储、归属与生命周期约束 |
-| [前端贡献指南](FRONTEND-CO-CREATION.md) | 修改入口与约束 |
-| [皮肤指南](SKIN-GUIDE.md) | token、CSS 和资源规则 |
-| [团队功能指南](TEAMWORK-GUIDE.md) | 团队功能与实现边界 |
+| [用户手册（中文）](USER-GUIDE.zh-CN.md) | 个性化页五个标签页、导入导出、分层与子代理策略、原有记忆功能 |
+| [User guide (English)](USER-GUIDE.en.md) | 同上 |
+| [README](../README.zh-CN.md) / [English](../README.md) | 定位、快速开始、迁移、开发 |
+| [CHANGELOG](../CHANGELOG.md) | 版本记录 |
 
-## 研究与工程记录
+## 设计文档
 
-- [研究论文](M7-RESEARCH-PAPER.md)：按文中日期和实验条件引用。
-- [路线图](ROADMAP.md)与 [M8–M10 交接记录](HANDOFF-M8-M9-M10.md)：历史计划，当前默认值先核对源码速查。
-- [内部记录](internal/)：审计、设计与现场证据。
-- [团队研究](teamwork-research/) / [实现记录](teamwork-impl/)：阶段研究与实现过程。
-- [截图](screenshots/) / [静态主页](landing/)：展示素材。
+[personalised/](personalised/) 是本仓库的设计资料。
 
-文档保留在源码仓库；npm 包内容以 `package.json` 的 `files` 为准。
+- [DESIGN.md](personalised/DESIGN.md)：分层架构、数据模型、档案格式、路由、配置键、界面。改接口先改它。
+- [rc3-audit.md](personalised/rc3-audit.md)：DSH rc3 适配审计。
+- [research-dsh-rc3-api.md](personalised/research-dsh-rc3-api.md)：rc3 API 调研。
+- [research-repo-map.md](personalised/research-repo-map.md)：仓库结构图。
 
-[中文 README](../README.zh-CN.md) · [English README](../README.md) · [CHANGELOG](../CHANGELOG.md)
+## 上游历史资料
+
+下面这些来自上游 dsh-auto-memory，保留是因为测试或源码注释仍在引用，内容停留在上游当时的状态。
+
+| 文档 | 说明 |
+|---|---|
+| [HANDBOOK.md](HANDBOOK.md)、[SOURCE-REFERENCE.md](SOURCE-REFERENCE.md)、[WHITEPAPER.md](WHITEPAPER.md) | 上游接手手册、默认值速查、存储约束。`smoke-test-issue111-docs-real-names` 会校验 HANDBOOK |
+| [SKIN-GUIDE.md](SKIN-GUIDE.md)、[TEAMWORK-GUIDE.md](TEAMWORK-GUIDE.md) | 皮肤规则、团队功能 |
+| [internal/](internal/) | 仅保留 `SEMANTIC-ARCHITECTURE-SPEC.md` 与 `THREE-LAYER-CONTRACT.md`，由 `smoke-test-doc-code-consistency` 对照 |
+| [skin-figures/](skin-figures/)、[ui-redesign-2026-09-25/](ui-redesign-2026-09-25/) | 皮肤指南引用的图和验收记录 |
+| [teamwork-impl/](teamwork-impl/)、[teamwork-research/](teamwork-research/) | 仅保留皮肤层章程、接口契约和布局 schema，供 `skins/` 与 `lib/layout-config.js` 引用 |
+
+其余上游文档（路线图、M7 研究、落地页、截图等）已从本仓库移除，可在上游仓库查看：https://github.com/Aik358/dsh-auto-memory
