@@ -1,0 +1,87 @@
+name: upstream-sync
+
+# 每天检查上游 Aik358/dsh-auto-memory 是否有新提交：
+#   - 能自动合并且 smoke 通过 → 直接推到 main（不改版本号，不触发发版）。
+#   - 有冲突、测试失败或上游改了 package.json 依赖 → 开（或更新）一个 upstream-sync issue 并 @ 维护者。
+# 合并规则见 tools/upstream-sync.mjs（品牌、文档、发布配置冲突时保留本仓库版本）。
+
+on:
+  schedule:
+    - cron: '17 1 * * *'   # 北京时间 09:17
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: upstream-sync
+  cancel-in-progress: false
+
+env:
+  MAINTAINER: LeonhardtHUST
+  VP_GIT_HOOKS: '0'
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: voidzero-dev/setup-vp@v1.22.0
+        with:
+          node-version: '24'
+          cache: true
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - name: 配置提交身份
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+      - id: merge
+        name: 合并上游
+        run: node tools/upstream-sync.mjs
+
+      - id: smoke
+        name: 合并后跑 smoke
+        if: steps.merge.outputs.status == 'merged'
+        continue-on-error: true
+        run: >-
+          node tools/run-smoke.mjs --jobs=1 --timeout=90000
+          --exclude=-live --exclude=m79-feature-v2 --exclude=m710-fv2-emit --exclude=c4-fresh-install
+
+      - name: 推送到 main
+        if: steps.merge.outputs.status == 'merged' && steps.smoke.outcome == 'success'
+        run: git push origin HEAD:main
+
+      - name: 通知维护者
+        if: >-
+          steps.merge.outputs.status == 'conflict' ||
+          steps.merge.outputs.attention == 'true' ||
+          (steps.merge.outputs.status == 'merged' && steps.smoke.outcome != 'success') ||
+          failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          STATUS: ${{ steps.merge.outputs.status }}
+          SMOKE: ${{ steps.smoke.outcome }}
+          SHA: ${{ steps.merge.outputs.upstream_sha }}
+          REPORT: ${{ steps.merge.outputs.report_file }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          case "$STATUS" in
+            conflict) reason="上游有改动无法自动合并" ;;
+            merged)   if [ "$SMOKE" != "success" ]; then reason="合并后 smoke 失败，未推送"; else reason="已自动合并，但有改动需要人工跟进"; fi ;;
+            *)        reason="同步流程出错" ;;
+          esac
+          body="@${MAINTAINER} ${reason}（上游 \`${SHA:-?}\`）。"$'\n\n'"运行记录：${RUN_URL}"
+          if [ -n "$REPORT" ] && [ -f "$REPORT" ]; then body="$body"$'\n\n'"$(cat "$REPORT")"; fi
+          gh label create upstream-sync --color FBCA04 --description '上游同步需要处理' 2>/dev/null || true
+          num=$(gh issue list --label upstream-sync --state open --json number -q '.[0].number')
+          if [ -n "$num" ]; then
+            gh issue comment "$num" --body "$body"
+          else
+            gh issue create --title "上游同步需要处理：$reason" --label upstream-sync --assignee "$MAINTAINER" --body "$body"
+          fi
