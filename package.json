@@ -1,10 +1,11 @@
 {
-  "name": "@a9i5k4/dsh-auto-memory",
-  "description": "Proactive associative memory for DSH: zero-prompt recall injected before the model speaks, three-layer auto-consolidation, skill crystallization, and Astra-style context management - handoff ledgers, PLAN whiteboard, water-level sensing. Local-first, model-agnostic, zero deps. 主动联想记忆+Astra 式上下文管理:自动唤回/自动沉淀/技能固化/交接账本与白板跨窗口续命/水位感知。",
-  "version": "3.3.17",
+  "name": "dsh-personalised",
+  "description": "Personalisation for DeepSeek Harness: stable custom system instructions, relevance-based personal memory, workspace-scoped project memory, and one-click memory import/export across AI platforms. Built on the dsh-auto-memory engine. DeepSeek Harness 个性化：稳定的自定义系统指令、按相关性注入的个人记忆、按工作区隔离的项目记忆，以及跨 AI 平台的记忆导入导出。",
+  "version": "1.0.0",
   "packageManager": "pnpm@12.21.0",
   "engines": {
-    "node": ">=24.9.0"
+    "node": ">=24.9.0",
+    "dsh": ">=0.2.2-rc.3 <0.3.0-0"
   },
   "type": "module",
   "scripts": {
@@ -37,31 +38,42 @@
     "!lib/*.*.*"
   ],
   "dsh": {
+    "manifestVersion": 1,
     "bundle": {
       "patch": "./cordis.patch.yml"
     },
     "client": {
+      "platform": "web",
       "inject": [
         "@deepseek-ai/dsh-api-remotes",
-        "@deepseek-ai/dsh-client-runtime",
         "@deepseek-ai/dsh-client-connection",
-        "@deepseek-ai/dsh-client-ui-slots",
         "@deepseek-ai/dsh-client-ui-settings",
         "@deepseek-ai/dsh-client-ui-sidebar"
-      ],
-      "platform": "web"
+      ]
     }
   },
   "keywords": [
     "dsh",
+    "dsh-plugin",
     "deepseek-harness",
+    "personalisation",
+    "personalization",
+    "custom-instructions",
     "memory",
-    "plugin",
-    "auto-memory"
+    "memory-import",
+    "plugin"
   ],
+  "homepage": "https://github.com/LeonhardtHUST/dsh-personalised#readme",
+  "bugs": {
+    "url": "https://github.com/LeonhardtHUST/dsh-personalised/issues"
+  },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Aik358/dsh-auto-memory.git"
+    "url": "git+https://github.com/LeonhardtHUST/dsh-personalised.git"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   },
   "peerDependencies": {
     "@deepseek-ai/cordis": "^4.0.1"
