@@ -2,6 +2,15 @@
 
 dsh-personalised 的版本记录。1.0.0 之前的版本历史见上游 https://github.com/Aik358/dsh-auto-memory/blob/main/CHANGELOG.md
 
+## [1.0.1] - 2026-11-18
+
+### 迁移与界面
+
+- 将运行时主配置和 API 前缀迁移到 `dsh-personalised`，保留旧配置、旧 API 和浏览器状态兼容入口。
+- 新增配置迁移、双路由、旧子代理标签回收和迁移回退文档。
+- 将插件浮层统一为 DSH solid surface：内容表面不透明、使用宿主圆角/边框/阴影令牌，移除玻璃模糊。
+- 新增迁移与 solid 浮层 smoke 回归测试。未删除现有图片素材，避免破坏仍在清单中的引用。
+
 ## [1.0.0] - 2026-11-17
 
 仓库从 dsh-auto-memory 的 fork 改为独立发布的个性化插件，记忆引擎沿用上游。
