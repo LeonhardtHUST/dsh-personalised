@@ -55,7 +55,10 @@ assert.equal(shared.props.scale, 1.25)
 assert.equal(shared.props.fitKey, 7)
 assert.equal(shared.props.allWorkspaces, true)
 test.ensureStyle()
-const css = tags.get('dsh-auto-memory-css').textContent
+// 2026-11-18：样式节点随已批准的新品牌改名；仍检查真 ensureStyle() 注入的表及交互。
+const style = tags.get('dsh-personalised-css')
+assert(style, 'ensureStyle injects the canonical plugin stylesheet')
+const css = style.textContent
 function rule(selector) {
   const start = css.indexOf(selector + ' {')
   assert(start >= 0, 'Shared injected stylesheet contains ' + selector)

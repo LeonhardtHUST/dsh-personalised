@@ -83,7 +83,8 @@ const count = (s, sub) => s.split(sub).length - 1
 }
 
 // ── ⑦ 宿主路由存在 + 前端消费（api-paths 守卫要求「接上界面」）
-check('⑦ 宿主 workbench 路由', /path: API\.workbench/.test(idx) && /workbench: '\/api\/dsh-auto-memory\/workbench'/.test(idx))
+// 2026-11-18：主路由随已批准的身份迁移更名，旧路径保留同处理器别名。
+check('⑦ 宿主 canonical workbench 路由', /path: API\.workbench/.test(idx) && /workbench: '\/api\/dsh-personalised\/workbench'/.test(idx))
 check('⑦ 前端 API 表有条目', /workbench: ROUTE_PREFIX \+ '\/workbench'/.test(cli))
 check('⑦ 前端实际调用', /apiPost\(API\.workbench/.test(cli))
 

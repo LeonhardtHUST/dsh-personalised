@@ -1,5 +1,5 @@
 // 2026-10-14: + migrate-upload (#397) and python-setup/config (#411); the exact route count lock remains.
-import { apply, name, inject, GUIDANCE } from '../../lib/index.js'
+import { apply, name, inject, GUIDANCE, API } from '../../lib/index.js'
 // 2026-08-16: 适配 section→context 迁移 —— 静态纪律在 section(稳定锚), 动态记忆在 context(user-role 快照)
 
 // T0: 与 isolation 系列一致,stub 掉真实网络(update-check/notices),避免测试进程被挂起 socket 拖住。
@@ -81,7 +81,22 @@ if (registeredTools.length !== 20) throw new Error('expected 20 tools (19 legacy
 //   teamEnabled=false 时返回 409 但**仍无条件注册**，故任何档位下都 +1）。
 // ★issue #211（2026-10-04）计数演进：70→71（新增 POST /python-setup/uninstall —— Python 引擎卸载，
 //   loopback-only，pythonBackendEnabled=false 时也**无条件注册**并可用，故任何档位下都 +1）。
+// 2026-11-18：已批准 canonical/legacy 双路由。原逻辑契约为 82，真实注册为 164；
+// 同时验证每条 API 的唯一 canonical 路由和同 handler 别名，避免总数正确但漏路由/复制错处理器。
+const logicalPaths = Object.values(API)
+if (logicalPaths.length !== 82 || new Set(logicalPaths).size !== 82) throw new Error('expected 82 unique logical API routes, got ' + logicalPaths.length)
 if (registeredRoutes.length !== 164) throw new Error('expected 164 routes (82 canonical + 82 legacy aliases), got ' + registeredRoutes.length)
+const byPath = new Map(registeredRoutes.map((route) => [route.path, route]))
+if (byPath.size !== registeredRoutes.length) throw new Error('duplicate registered route paths')
+for (const canonicalPath of logicalPaths) {
+  if (!canonicalPath.startsWith('/api/dsh-personalised/')) throw new Error('non-canonical API route: ' + canonicalPath)
+  const canonical = byPath.get(canonicalPath)
+  const legacyPath = canonicalPath.replace('/api/dsh-personalised/', '/api/dsh-auto-memory/')
+  const legacy = byPath.get(legacyPath)
+  if (!canonical || !legacy) throw new Error('missing canonical/legacy route pair: ' + canonicalPath)
+  if (typeof canonical.handler !== 'function' || legacy.handler !== canonical.handler) throw new Error('legacy route must share canonical handler and guards: ' + canonicalPath)
+}
+console.log('route contract: 82 logical API routes / 164 unique registrations / 82 shared-handler aliases')
 if (sections.length !== 2) throw new Error('expected 2 prompt sections (static rules + dsh-personalised instructions)')
 if (contexts.length !== 3) throw new Error('expected 3 dynamic contexts (memory snapshot + m6 reference tail + dsh-personalised P/W), got ' + contexts.length)
 

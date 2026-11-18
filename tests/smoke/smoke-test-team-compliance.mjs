@@ -45,7 +45,8 @@ function scanBalanced(s, open) {
 }
 
 // ── R 路由形状 ─────────────────────────────────────────────────────────
-ok(idx.includes("teamCompliance: '/api/dsh-auto-memory/team-compliance'"), 'R1 API 常量 teamCompliance 存在')
+// 2026-11-18：API 表已批准改 canonical 前缀；以下 handler 行为与零出网判据保持不变。
+ok(idx.includes("teamCompliance: '/api/dsh-personalised/team-compliance'"), 'R1 canonical API 常量 teamCompliance 存在')
 const start = idx.indexOf("path: API['teamCompliance'],")
 ok(start > 0, 'R2 handler 挂在 API.teamCompliance 上')
 const rest = idx.slice(start)
@@ -61,7 +62,7 @@ async function invoke(cfg) {
   const calls = []
   const writeJson = (res, code, body) => { calls.push({ code, body }) }
   const isLoopbackRequest = () => true
-  const API = { teamCompliance: '/api/dsh-auto-memory/team-compliance' }
+  const API = { teamCompliance: '/api/dsh-personalised/team-compliance' }
   const engine = { config: cfg }
   const fn = new Function('engine', 'writeJson', 'isLoopbackRequest', 'API', 'panelAllowedHosts', 'forbiddenPanelPayloadPre', 'return ' + handlerSrc)
   await fn(engine, writeJson, isLoopbackRequest, API, [], (req) => ({ error: 'forbidden: panel-access' }))({}, {})

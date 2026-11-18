@@ -112,7 +112,8 @@ ok(regAt > CL.indexOf('function registerSurfaces() {'), 'C2 注册发生在 regi
 ok(regSlice.indexOf("slots.register({ name: 'settings.section'") >= 0, 'C3 走既有注册写法（slots.register + name）')
 ok(regSlice.indexOf("label: function () { return L('个性化', 'Personalisation') }") >= 0, 'C4 label 双语（本地化函数）')
 ok(regSlice.indexOf('PersonalisedSettings') >= 0, 'C5 渲染 PersonalisedSettings')
-ok(CL.indexOf("id: 'auto-memory-pre', order: 25") >= 0, 'C6 旧记忆设置页仍在（order 25，未被顶掉）')
+// 2026-11-18：引擎设置入口随已批准的品牌迁移改名；保留 order 与组件判据。
+ok(CL.indexOf("id: 'personalised', order: 25") >= 0, 'C6 记忆引擎设置页仍在（canonical id，order 25，未被顶掉）')
 
 // ── D 改名 ──────────────────────────────────────────────────────────────────
 console.log('[D] 模块 id 与包名认领')
@@ -121,7 +122,8 @@ ok(CL.indexOf("id: '@a9i5k4/dsh-auto-memory'") < 0, 'D2 旧模块 id 已移除�
 ok(CL.indexOf("subj.pkg.name !== '@a9i5k4/dsh-auto-memory'") >= 0, 'D3 plugins.detail 仍认领旧包名')
 ok(CL.indexOf("&& subj.pkg.name !== 'dsh-personalised'") >= 0, 'D4 plugins.detail 同时认领新包名')
 ok(CL.indexOf("if (!subj || subj.kind !== 'bundle' || !subj.pkg) return null") >= 0, 'D5 非 bundle / 无 pkg 返回 null（宿主契约）')
-ok(CL.indexOf("var ROUTE_PREFIX = '/api/dsh-auto-memory'") >= 0, 'D6 路由前缀保持旧名（兼容旧数据与旧测试）')
+// 2026-11-18：用户批准新前缀为 canonical；兼容别名由宿主保留，客户端不回退旧名。
+ok(CL.indexOf("var ROUTE_PREFIX = '/api/dsh-personalised'") >= 0, 'D6 路由前缀使用 canonical 新名（宿主保留旧别名）')
 
 // ── E 界面质量硬要求 ────────────────────────────────────────────────────────
 console.log('[E] 五个标签页与导入向导')

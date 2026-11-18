@@ -32,7 +32,8 @@ ok(/function dispatchStartupDialog\(d, cfg(?:, wbReady)?\) \{/.test(SRC), '具�
 ok(/function welcomeAutoAllowedPre\(cfg\) \{/.test(SRC), 'welcomeAutoAllowedPre 配置闸函数存在')
 ok((SRC.match(/if \(allowTour && /g) || []).length === 3, '三个欢迎向导自动弹出分支全部经过 allowTour 配置闸')
 const updateView = SRC.slice(SRC.indexOf('function Iter5Update(props)'), SRC.indexOf('function Iter5AutoContinue(props)'))
-ok(SRC.includes("var seenV = (dialogState && dialogState.currentVersion) || lastV; if (seenV) localStorage.setItem('dsh-auto-memory.seenVersion', seenV)")
+// 2026-11-18：seenVersion 已批准写新键；关闭仍必须记录当前安装版本。
+ok(SRC.includes("var seenV = (dialogState && dialogState.currentVersion) || lastV; if (seenV) localStorage.setItem('dsh-personalised.seenVersion', seenV)")
   && SRC.includes('h(Iter5Update, { versions: versions, version: dialogState.currentVersion || lastV, onClose: function ()')
   && updateView.includes('onClose: props.onClose') && updateView.includes('onClick: props.onClose'),
   'update 卡 ✕/知道了 关闭写入 currentVersion(修复 seen 被钉回 0.1.30 的「每次打开都弹」死循环)')
@@ -52,16 +53,27 @@ function extractFn(header) {
 }
 const fnSrc = extractFn('function dispatchStartupDialog(d, cfg, wbReady) {')
 const allowPreSrc = extractFn('function welcomeAutoAllowedPre(cfg) {')
+// 2026-11-18：分发读取 canonical 键；实际模块先迁移旧状态，再运行分发。
+// 保留 G1–G11 全部旧键夹具，真执行产线迁移，避免仅换夹具掩盖老用户重复弹窗。
+const migrationStart = SRC.indexOf(';(function migratePersonalisedStorage()')
+const migrationEnd = SRC.indexOf('// DSH-PERSONALISED END browser-state migration.', migrationStart)
+ok(migrationStart > 0 && migrationEnd > migrationStart, '启动前浏览器状态迁移可抽取')
+const migrationSrc = SRC.slice(migrationStart, migrationEnd)
+const majorKey = SRC.match(/var MAJOR_TOUR_KEY = '([^']+)'/)
+ok(!!majorKey && majorKey[1] === 'dsh-personalised.majorTourV130', '向导状态使用 canonical key')
 
 function run(current, storageMap, cfg, wbReady) {
   const factory = new Function('openDialog', 'cmpVersion', 'allowPreSrc', 'cfgJson', 'wbReady', `
-    var MAJOR_TOUR_KEY = 'dsh-auto-memory.majorTourV130'
+    var MAJOR_TOUR_KEY = ${JSON.stringify(majorKey[1])}
     var localStorage = {
       _m: new Map(${JSON.stringify([...(storageMap || [])])}),
+      get length() { return this._m.size },
+      key: function (i) { return Array.from(this._m.keys())[i] },
       getItem: function (k) { return this._m.has(k) ? this._m.get(k) : null },
       setItem: function (k, v) { this._m.set(k, String(v)) },
       removeItem: function (k) { this._m.delete(k) },
     }
+    ${migrationSrc}
     var opened = []
     var queued = []
     function openDialog(d) { opened.push(d && d.kind) }
@@ -76,7 +88,7 @@ function run(current, storageMap, cfg, wbReady) {
     ${allowPreSrc}
     ${fnSrc}
     try { dispatchStartupDialog({ current: '${current}' }, JSON.parse(cfgJson), wbReady) } catch (e) { opened.push('THROW:' + (e && e.message)) }
-    return { opened: opened, queued: queued }
+    return { opened: opened, queued: queued, storage: Object.fromEntries(localStorage._m) }
   `)
   return factory(function () {}, function () {}, allowPreSrc, JSON.stringify(cfg === undefined ? null : cfg), wbReady)
 }
@@ -162,6 +174,21 @@ console.log('[startup-dispatch] G11c S9: 就绪状态未知(缺省)→ 行为与
 {
   const r = run('0.1.37', [['dsh-auto-memory.seenVersion', '0.1.36'], S('dsh-auto-memory.semWizardDone'), S('dsh-auto-memory.majorTourV130')], CFG_ON)
   ok(r.opened.length === 1 && r.opened[0] === 'update', '缺省(undefined) ⇒ 不延后(向后兼容)')
+}
+
+console.log('[startup-dispatch] G12 新键状态与迁移优先级（2026-11-18）')
+{
+  const canonical = [['dsh-personalised.seenVersion', '0.1.37'], S('dsh-personalised.semWizardDone'), S('dsh-personalised.majorTourV130')]
+  const fresh = run('0.1.37', canonical, CFG_ON)
+  ok(fresh.opened.length === 0 && fresh.queued.length === 0, 'canonical 已读状态直接静默')
+  const mixed = run('0.1.37', [...canonical, ['dsh-auto-memory.seenVersion', '0.1.29']], CFG_ON)
+  ok(mixed.opened.length === 0 && mixed.queued.length === 0, 'canonical 当前版本优先于旧键的过期版本')
+  ok(mixed.storage['dsh-auto-memory.seenVersion'] === '0.1.29', '旧版本状态原样保留供回滚')
+  const upgraded = run('0.1.37', [['dsh-auto-memory.seenVersion', '0.1.36'], S('dsh-auto-memory.semWizardDone')], CFG_ON)
+  ok(upgraded.storage['dsh-personalised.seenVersion'] === '0.1.37', '旧状态迁移后，更新通知写 canonical 当前版本')
+  ok(upgraded.storage['dsh-auto-memory.seenVersion'] === '0.1.36', '通知分发不改写旧状态')
+  const dismissedPreview = run('0.1.37', [S('dsh-auto-memory-pre.tourDismissed')], CFG_ON)
+  ok(dismissedPreview.opened.length === 0, '旧 preview 键的关闭意愿迁移后仍生效')
 }
 
 console.log(`[startup-dispatch] pass=${pass} fail=${fail}`)

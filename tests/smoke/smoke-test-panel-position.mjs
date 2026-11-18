@@ -44,7 +44,8 @@ const tabsReuse = (SRC.match(/(?<!function )MEMORY_TABS\(\)/g) || []).length
 eq(tabsReuse, 2, '浮层与会话页各调用一次 MEMORY_TABS（同一页签源）')
 
 console.log('== 2. 承载面三档 & 持久化 & 旧值迁移 ==')
-ok(/var POS_KEY = 'dsh-auto-memory\.panel\.pos'/.test(SRC), 'pos 使用独立 localStorage key（与 geom/pin 解耦）')
+// 2026-11-18：已批准浏览器状态改用 canonical 新键；旧键由模块读取前的迁移保留兼容。
+ok(/var POS_KEY = 'dsh-personalised\.panel\.pos'/.test(SRC), 'pos 使用 canonical 独立 localStorage key（与 geom/pin 解耦）')
 ok(/var PANEL_POS_VALUES = \{ 'bottom-left': 1, page: 1, both: 1 \}/.test(SRC), '合法值枚举受控（bottom-left | page | both）')
 ok(/if \(savedPos === 'top'\) savedPos = 'page'/.test(SRC), '旧值 top(覆盖条) 自动迁移为 page（老用户不必手动重选）')
 // ★2026-09-22 期望值更新:默认承载面由 'bottom-left' 改为 'both'(用户拍板:出厂即两者共存,
@@ -54,7 +55,8 @@ ok(/panelPos = PANEL_POS_VALUES\[v\] \? v : 'both'/.test(SRC), '非法值回退�
 ok(/panelPos: function \(\) \{ return panelPos \}/.test(SRC), 'controller.panelPos() 暴露给设置页')
 
 console.log('== 3. 「会话页」注册在 conversation.view（与对话轨迹/白板看板并列） ==')
-ok(/slots\.inject\('conversation\.view', function \(\) \{[\s\S]{0,300}id: 'auto-memory-pre-panel'/.test(SRC), '记忆页注册到 conversation.view,id=auto-memory-pre-panel')
+// 2026-11-18：slot id 与打开完整工作台的查询一起迁移为 personalised-panel。
+ok(/slots\.inject\('conversation\.view', function \(\) \{[\s\S]{0,300}id: 'personalised-panel'/.test(SRC), '记忆页注册到 conversation.view,id=personalised-panel')
 // ★2026-09-28 放宽：内联文案已由 `locale === 'zh' ? 甲 : 乙` 统一改为 `L(甲, 乙)`，
   //   断言改为**形态无关**（两种写法都接受），以后再加语言无需再改本断言。
   ok(/(label: function \(\) \{ return (?:locale === 'zh' \? '记忆' : 'Memory'|L\('记忆', 'Memory'\))) \}/.test(SRC), '页签标签中英双语（形态无关）')

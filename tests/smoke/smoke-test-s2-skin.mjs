@@ -87,7 +87,8 @@ ok(totalBytes > 0, '§3.3 6 槽位合计字节数可复算', totalBytes + ' B')
 
 /* ── §4 宿主只读路由（4.3 通路一半） ──────────────────────────────── */
 const idx = readFileSync(join(ROOT, 'lib', 'index.js'), 'utf8')
-ok(idx.includes("skinAsset: '/api/dsh-auto-memory/skin-asset'"), '§4.1 宿主 API 表登记 skinAsset')
+// 2026-11-18：API 表使用已批准的新前缀；旧 URL 仍经同处理器别名服务，不改素材行为。
+ok(idx.includes("skinAsset: '/api/dsh-personalised/skin-asset'"), '§4.1 宿主 canonical API 表登记 skinAsset')
 ok(idx.includes('from \'./skin-assets.js\''), '§4.2 宿主真 import 皮肤数据表（单源，不是各写一份）')
 ok(idx.includes("path: API.skinAsset"), '§4.3 路由条目真实注册')
 ok(idx.includes('skinKeyFromRequestPre'), '§4.4 有 query key 解析（白名单）')

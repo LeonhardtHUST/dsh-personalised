@@ -147,7 +147,8 @@ const ctx5a = makeCtx(store5a, () => { hits++ })
 vm.runInNewContext('(' + pickSrc + ')({ family: \'water\', id: \'water\' })', ctx5a)
 assert.equal(store5a.get('dam-skin'), 'v4', 'variant pick must set dam-skin=v4')
 assert.equal(store5a.get('dam-skin-style'), 'water', 'variant pick must set dam-skin-style=water')
-assert.equal(store5a.get('dsh-auto-memory.presentation.v1'), 'water', 'variant pick must mirror into the variants key')
+// 2026-11-18：已批准 presentation 持久化写新键；仍真执行 pick 并检查镜像值。
+assert.equal(store5a.get('dsh-personalised.presentation.v1'), 'water', 'variant pick must mirror into the canonical variants key')
 assert.equal(hits, 1, 'onSwitch must fire exactly once per pick')
 
 // 5b) 选「基线」⇒ 删除 dam-skin（回到未显式选过语义），style=legacy

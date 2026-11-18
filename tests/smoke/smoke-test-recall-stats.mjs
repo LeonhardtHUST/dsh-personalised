@@ -120,7 +120,8 @@ ok(cnt(IX, 'this._recallStats.observe(') === 1, 'S3c 埋点调用存在（命中
   ok(/try\s*\{/.test(around) && /catch\s*\(_\)\s*\{\}/.test(around), 'S3g 埋点被 try/catch 包住（fail-soft，绝不影响召回）')
 }
 ok(cnt(IX, 'path: API.recallStats,') === 1, 'S3h 只读路由已注册（命中 1）')
-ok(cnt(IX, "recallStats: '/api/dsh-auto-memory/recall-stats'") === 1, 'S3i API 路径键存在（A1/A4 路径锁要求）')
+// 2026-11-18：canonical API 已批准更名；旧路由由 compatibleRoutes 同处理器注册。
+ok(cnt(IX, "recallStats: '/api/dsh-personalised/recall-stats'") === 1, 'S3i canonical API 路径键存在（A1/A4 路径锁要求）')
 ok(/path: API\.recallStats,[\s\S]{0,900}?isLoopbackRequest\(req, panelAllowedHosts\)/.test(IX), 'S3j 路由仍是 loopback-only（安全不变量）')
 
 console.log('\n[S3b] 三条通路埋点齐备（2026-09-22 用户拍板「分开计算」）')

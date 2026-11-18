@@ -10,18 +10,25 @@ import { resolveAutoConfig, CHECK_INTERVAL_MIN_MIN, CHECK_INTERVAL_MIN_MAX } fro
 const home = await fs.mkdtemp(path.join(os.tmpdir(), 'dam-archive-interval-'))
 const host = await startRecallHost(home)
 try {
+  // 2026-11-18：夹具仍从旧配置迁入；保存权威已是新文件，拒写须检查实际写目标。
+  const configFile = path.join(home, 'dsh-personalised.json')
+  const legacyFile = path.join(home, 'dsh-auto-memory.json')
+  const legacyBefore = await fs.readFile(legacyFile, 'utf8')
   for (const value of [1, 14, 1441, 15.5]) {
-    const before = await fs.readFile(path.join(home, 'dsh-auto-memory.json'), 'utf8')
+    const before = await fs.readFile(configFile, 'utf8')
     const response = await host.request('config', { autoArchiveCheckMin: value, welcomeTourEnabled: false })
     assert.equal(response.status, 400, 'invalid interval must reject the entire patch: ' + value)
     assert.ok(response.data.fields.autoArchiveCheckMin)
-    assert.equal(await fs.readFile(path.join(home, 'dsh-auto-memory.json'), 'utf8'), before)
+    assert.equal(await fs.readFile(configFile, 'utf8'), before, 'invalid patch preserves the canonical configuration bytes')
+    assert.equal(await fs.readFile(legacyFile, 'utf8'), legacyBefore, 'invalid patch preserves the legacy rollback source')
   }
   for (const value of [CHECK_INTERVAL_MIN_MIN, CHECK_INTERVAL_MIN_MAX]) {
     const response = await host.request('config', { autoArchiveCheckMin: value })
     assert.equal(response.status, 200)
     assert.equal(response.data.config.autoArchiveCheckMin, value)
     assert.equal(resolveAutoConfig({ checkIntervalMin: value }).checkIntervalMin, value)
+    assert.equal(JSON.parse(await fs.readFile(configFile, 'utf8')).autoArchiveCheckMin, value, 'valid interval persists to the canonical configuration')
+    assert.equal(await fs.readFile(legacyFile, 'utf8'), legacyBefore, 'valid save preserves the legacy rollback source')
   }
   for (const file of ['lib/client.js', 'skins/legacy/iter5-325.js.frozen']) {
     const text = await fs.readFile(new URL('../../' + file, import.meta.url), 'utf8')
@@ -86,7 +93,10 @@ try {
       //     ⇒ 本次漂移 100% 来自这 8 行，无历史内容混入。
       // ★2026-10-20 重钉（3d9862ae… → f4ce3086…）：v3.3.11 版本标识两处（指纹行 + 应用内更新说明字典新增 3.3.11 条目），
       //   均在经典区手写面（生成区之外）⇒ 本锁随动，行为代码零改动。判据意图不变（经典区字节守恒）。
-      assert.equal(createHash('sha256').update(prior).digest('hex'), '26851557ef4620be76891cda4f9366a14012dc16dceb9c034955f6c1a22ed031', 'classic client region bytes are conserved (interval control normalized back to 1/1440); [R2026-11-17b: 导入预览「处理模型」显示 provider/model（审查 P2，手写区一行）⇒ 重钉 12991e4f… → 26851557…；R2026-11-17: dsh-personalised 个性化设置区块（生成块之外手写区新增 DSH-PERSONALISED BEGIN/END）+ 客户端模块 id 改名（@a9i5k4/dsh-auto-memory → dsh-personalised，plugins.detail.section 新旧双名认领）+ exports.inject 追加 locale（rc3 审计 P2-4）⇒ 本锁按实测 actual 重钉 5226d738… → 57c72289… → 788a4083… → 12991e4f…（三次均为同一批次内增量，最后一次含保存后不整页回加载 / 编辑框仅写成功才收起等交互细化）。判据意图不变（经典区字节守恒）。★归因实测：git show HEAD:lib/client.js 用本套件同一表达式复算 = 5226d738…（与旧锁逐字节相等）⇒ 漂移 100% 来自本批，无历史内容混入] pinned upstream baseline superseded by reviewed batches [R2026-10-23: v3.3.17 版本身份三件套（指纹行 + 应用内 CHANGELOG 3.3.17 条目，均在生成块之外）⇒ 按实测 actual 重钉 e31fa808… → 5226d738…；归因实测：还原 client.js 到 HEAD 后本套件 exit=0，判据过期非缺陷]')
+      // 2026-11-18：1d99e159 的已批准品牌/浏览器状态迁移与 native-solid 接线改变手写区。
+      // 本套件同表达式复算 f164c5ca=26851557…，1d99e159 与当前 HEAD=b2e5c143…；
+      // 仅更新遗漏的字节基线，15–1440 校验及非法 patch 全拒行为保持不变。
+      assert.equal(createHash('sha256').update(prior).digest('hex'), 'b2e5c143866c1afe7f1edd416df485cae0061dd8f2bbfd6fe0e6b5488caafb6b', 'classic client region bytes are conserved (interval control normalized back to 1/1440); [R2026-11-17b: 导入预览「处理模型」显示 provider/model（审查 P2，手写区一行）⇒ 重钉 12991e4f… → 26851557…；R2026-11-17: dsh-personalised 个性化设置区块（生成块之外手写区新增 DSH-PERSONALISED BEGIN/END）+ 客户端模块 id 改名（@a9i5k4/dsh-auto-memory → dsh-personalised，plugins.detail.section 新旧双名认领）+ exports.inject 追加 locale（rc3 审计 P2-4）⇒ 本锁按实测 actual 重钉 5226d738… → 57c72289… → 788a4083… → 12991e4f…（三次均为同一批次内增量，最后一次含保存后不整页回加载 / 编辑框仅写成功才收起等交互细化）。判据意图不变（经典区字节守恒）。★归因实测：git show HEAD:lib/client.js 用本套件同一表达式复算 = 5226d738…（与旧锁逐字节相等）⇒ 漂移 100% 来自本批，无历史内容混入] pinned upstream baseline superseded by reviewed batches [R2026-10-23: v3.3.17 版本身份三件套（指纹行 + 应用内 CHANGELOG 3.3.17 条目，均在生成块之外）⇒ 按实测 actual 重钉 e31fa808… → 5226d738…；归因实测：还原 client.js 到 HEAD 后本套件 exit=0，判据过期非缺陷]')
     }
   }
   console.log('PASS archive interval UI/API/runtime agree on 15–1440, invalid patches preserve configuration')
