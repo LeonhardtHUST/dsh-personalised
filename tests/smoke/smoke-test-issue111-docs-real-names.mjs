@@ -34,14 +34,20 @@ const read = (rel) => readFileSync(path.join(ROOT, rel), 'utf8')
 const norm = (s) => s.replace(/\\/g, '/')
 
 // ---------- ① 源码真值（lib/index.js；去 pre 后即发布真值） ----------
+// R2026-11-18: dsh-personalised canonical identity/config migration or native-solid layer
+// 真值口径：端点前缀 / 配置名 / 诊断日志名都取 canonical 真名；旧 /api/dsh-auto-memory 只是别名，
+// 不再作为「真值」，也不再拿它当 endpointLiterals[0] 的推导输入（改名后它会 0 条 ⇒ .split 崩）。
 const src = read('lib/index.js')
-const endpointLiterals = [...new Set([...src.matchAll(/'(\/api\/dsh-auto-memory[^']*)'/g)].map((m) => m[1]))]
+const endpointLiterals = [...new Set([...src.matchAll(/'(\/api\/dsh-personalised[^']*)'/g)].map((m) => m[1]))]
 ok(endpointLiterals.length > 0, `从 lib/index.js 取到端点字面量(${endpointLiterals.length} 条)`)
 const PREFIX = endpointLiterals[0].split('/').slice(0, 3).join('/') + '/'
-ok(PREFIX === '/api/dsh-auto-memory/', '端点前缀为裸名（去 pre 后无 -pre 变体）', PREFIX)
+ok(PREFIX === '/api/dsh-personalised/', '端点前缀为 canonical dsh-personalised', PREFIX)
 
-const diagName = (src.match(/'dsh-auto-memory[^']*diagnose\.log'/) || [''])[0].slice(1, -1)
-const cfgName = (src.match(/'dsh-auto-memory[^']*\.json'/) || [''])[0].slice(1, -1)
+const diagName = (src.match(/'dsh-personalised[^']*diagnose\.log'/) || [''])[0].slice(1, -1)
+// 配置文件名已收敛到 CONFIG_FILENAME 常量（lib/personal/legacy-migration.js），仍以源码真值取。
+const migrationSrc = read('lib/personal/legacy-migration.js')
+const cfgName = (migrationSrc.match(/CONFIG_FILENAME = '([^']+)'/) || [])[1] || ''
+ok(cfgName, '从 lib/personal/legacy-migration.js 取到配置文件名', cfgName)
 ok(diagName && cfgName, '从 lib/index.js 取到诊断日志与配置文件名', `${diagName} / ${cfgName}`)
 ok(!diagName.includes('-pre') && !cfgName.includes('-pre'), '诊断日志/配置名均无 -pre 拼写')
 

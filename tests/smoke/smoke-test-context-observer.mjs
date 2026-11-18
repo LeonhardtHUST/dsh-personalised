@@ -115,7 +115,21 @@ const turnStartEvent = (seq, turn, time) => ({ type: 'turn/start', seq, time: ti
 // ★2026-10-01 再演进：68→69（新增 /global-brief）。
 // ★2026-10-02 再演进：69→70（审计修复批 #174 新增 POST /team-control，loopback-only，无条件注册）。
 // ★issue #211（2026-10-04）再演进：70→71（新增 POST /python-setup/uninstall，无条件注册）。
-    if (h.registeredRoutes.length !== 82) throw new Error('route count drifted (73 legacy + 9 dsh-personalised API): ' + h.registeredRoutes.length)
+    // R2026-11-18: dsh-personalised canonical identity/config migration or native-solid layer
+    // 逻辑路由仍 82 条（canonical /api/dsh-personalised 主表）；兼容层再按旧前缀注册一份**同一 handler**
+    // 别名 ⇒ 实际注册 164。这里三项都要验（82 / 164 / 82 共享），不要在第一项不符时就中止。
+    const logicalRoutes = h.registeredRoutes.filter((r) => r.path.startsWith('/api/dsh-personalised/'))
+    if (logicalRoutes.length !== 82) throw new Error('logical route count drifted (canonical dsh-personalised table): ' + logicalRoutes.length)
+    if (h.registeredRoutes.length !== 164) throw new Error('registered route count drifted (82 canonical + 82 legacy alias): ' + h.registeredRoutes.length)
+    let sharedHandler = 0
+    for (const route of logicalRoutes) {
+      const legacyPath = '/api/dsh-auto-memory/' + route.path.slice('/api/dsh-personalised/'.length)
+      const alias = h.registeredRoutes.find((r) => r.path === legacyPath)
+      if (!alias) throw new Error('legacy alias missing: ' + legacyPath)
+      if (alias.handler !== route.handler) throw new Error('legacy alias must share the canonical handler: ' + legacyPath)
+      sharedHandler += 1
+    }
+    if (sharedHandler !== 82) throw new Error('shared-handler alias count drifted: ' + sharedHandler)
     const cfg = await h.prime()
     // 2026-08-26 裁定:reasoningObserverEnabled/contextBridgeObserveChildSessions 默认 true
     // (开源模型为主,思维链/分支是主要观测面);其余实验开关仍默认 false

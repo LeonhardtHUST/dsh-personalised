@@ -135,7 +135,9 @@ ok(body.error === 'forbidden: panel-access', 'A7 error 字段已更名为 panel-
 ok(body.reason === 'loopback-only', 'A7 未配置时 reason=loopback-only')
 ok(body.allowlistConfigured === false, 'A7 未配置时 allowlistConfigured=false')
 ok(body.remoteAddress === '192.168.1.9' && body.host === '192.168.1.5:35117', 'A7 带来源与 Host 现场（排障必需）')
-ok(typeof body.hint === 'string' && body.hint.includes('DSH_AUTO_MEMORY_ALLOWED_HOSTS'), 'A7 hint 指出环境变量名（用户能照做）')
+// R2026-11-18: dsh-personalised canonical identity/config migration or native-solid layer
+  ok(typeof body.hint === 'string' && body.hint.includes('DSH_PERSONALISED_ALLOWED_HOSTS'), 'A7 hint 指出 canonical 环境变量名（用户能照做）')
+  ok(typeof body.hint === 'string' && !body.hint.includes('DSH_AUTO_MEMORY_ALLOWED_HOSTS'), 'A7 hint 不再把用户指向旧环境变量名')
 // ★复核修正（2026-10-22）：原写 `... || true` ⇒ 恒真、等于没测（违反「断言不得恒真」纪律）。
 //   真判据：白名单里有 A，请求 Host 是 B ⇒ 403 体不得出现**白名单条目 A**（否则攻击者可
 //   用 403 体逐条探测哪些主机名在白名单里）。注意 body.host 是**请求的** Host，不是白名单内容。
@@ -160,7 +162,11 @@ ok(SRC.includes('const panelAllowedHosts = parseAllowedHostsPre('), 'B3 apply �
 const declAt = SRC.indexOf('const panelAllowedHosts = parseAllowedHostsPre(')
 const routesAt = SRC.indexOf('  const routes = [')
 ok(declAt > 0 && routesAt > 0 && declAt < routesAt, 'B4 panelAllowedHosts 声明在 routes 之前（否则 TDZ 会抛 ReferenceError）')
-ok(SRC.includes('DSH_AUTO_MEMORY_ALLOWED_HOSTS'), 'B5 环境变量入口存在')
+// R2026-11-18: dsh-personalised canonical identity/config migration or native-solid layer
+const MIGRATION_SRC = readFileSync(path.join(ROOT, 'lib', 'personal', 'legacy-migration.js'), 'utf8')
+ok(SRC.includes('DSH_PERSONALISED_ALLOWED_HOSTS'), 'B5 环境变量入口存在（canonical DSH_PERSONALISED_ALLOWED_HOSTS）')
+ok(MIGRATION_SRC.includes('DSH_PERSONALISED_ALLOWED_HOSTS') && MIGRATION_SRC.includes('DSH_AUTO_MEMORY_ALLOWED_HOSTS'), 'B5b legacy DSH_AUTO_MEMORY_ALLOWED_HOSTS 仍作 fallback（canonical 未设置时读旧名，显式空值不回落）')
+ok(SRC.includes('panelAllowedHostsSource(process.env'), 'B5c 宿主统一走 canonical helper panelAllowedHostsSource')
 ok(/panelAllowedHosts:\s*''/.test(SRC), "B6 DEFAULT_CONFIG 新增 panelAllowedHosts 且默认为空（默认不改变行为）")
 
 /* ══════════════════════════════════════════════════════════════

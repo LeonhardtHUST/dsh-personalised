@@ -344,7 +344,11 @@ const rows = (s, re) => (s.match(re) || []).length
 ok(rows(CLIENT_SRC, /field\(t\('fWaterProxyCompat'\)/g) === 3, 'D8 三面设置页各有 1 个控件（实测 ' + rows(CLIENT_SRC, /field\(t\('fWaterProxyCompat'\)/g) + ' 处）')
 ok(rows(FROZEN_SRC, /field\(t\('fWaterProxyCompat'\)/g) === 1, 'D9 冻结基线档也补了控件（settings-parity 三面同步）')
 ok(/waterMeterProxy/.test(CLIENT_SRC), 'D10 水位卡 meter 文案含代理档')
-ok(/'dsh-auto-memory\.proxyCompatOffer'/.test(CLIENT_SRC), 'D11 弹窗去重标记存在（accepted/never/later 三态）')
+// R2026-11-18: dsh-personalised canonical identity/config migration or native-solid layer
+ok(/'dsh-personalised\.proxyCompatOffer'/.test(CLIENT_SRC), 'D11 弹窗去重标记存在（accepted/never/later 三态）')
+ok(/var prefixes = \['dsh-auto-memory\.', 'dsh-auto-memory-pre\.'\]/.test(CLIENT_SRC) &&
+  /'dsh-personalised\.' \+ key\.slice\(prefix\.length\)/.test(CLIENT_SRC),
+'D11b 旧键 dsh-auto-memory.proxyCompatOffer 仍由一次性迁移复制到 canonical（旧状态不丢）')
 ok(/dialogState\.kind === 'proxyCompat'/.test(CLIENT_SRC), 'D12 弹窗渲染分支存在')
 ok(/d\.kind === 'proxyCompat'\) return 40/.test(CLIENT_SRC), 'D13 弹窗优先级已登记（低于语义检测 45）')
 ok(/checkProxyCompatOffer/.test(CLIENT_SRC) && /s\.waterLevelProxyCompatDetected !== true\) return/.test(CLIENT_SRC), 'D14 弹窗只在 detected=true 时打开')

@@ -99,13 +99,14 @@ console.log('[①] 主路径 parseCalendar / renderCalendar')
     { date: '2026-10-21', done: false, time: '23:59', quadrant: '不重要不紧急', title: 'BME1D02 数据提交', note: '' },
   ], '① 旧文件（无续行）解析逐字段不变（含 --:-- 与空备注）')
 
-  // ①-2 单行渲染与改动前逐字节一致
+  // ①-2 单行渲染与改动前逐字节一致（除品牌名按 canonical 更新，见 R2026-11-18 归因）
+  // R2026-11-18: dsh-personalised canonical identity/config migration or native-solid layer
   eq(render([
     { date: '2026-10-20', time: '09:00', quadrant: '重要紧急', title: '交报告', note: '单行备注' },
     { date: '2026-10-20', time: '--:--', quadrant: '未分类', title: '无时限条目', note: '' },
   ]), [
     '# 日历与日程 (CALENDAR)', '',
-    '> 由 dsh-auto-memory 维护;AI 可从对话中提取 deadline/约定写入,用户也可在 GUI 操作。', '',
+    '> 由 dsh-personalised 维护;AI 可从对话中提取 deadline/约定写入,用户也可在 GUI 操作。', '',
     '## 2026-10-20',
     '- [ ] --:-- | 未分类 | 无时限条目',
     '- [ ] 09:00 | 重要紧急 | 交报告 | 单行备注',

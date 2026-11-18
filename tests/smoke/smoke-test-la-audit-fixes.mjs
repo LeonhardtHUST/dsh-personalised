@@ -19,6 +19,10 @@ import path from 'node:path'
 import { pathToFileURL } from 'node:url'
 
 const ROOT = path.resolve(import.meta.dirname, '..', '..')
+// R2026-11-18: dsh-personalised canonical identity/config migration or native-solid layer
+// 变异锚按**文件实际行尾**构造：仓库 lib/index.js 现为 LF，硬编码 \r\n 会恒 0 命中（断言先炸，测不到判据）。
+const INDEX_EOL_SRC = readFileSync(path.join(ROOT, 'lib', 'index.js'), 'utf8')
+const eolFor = (line) => (INDEX_EOL_SRC.includes(line + '\r\n') ? '\r\n' : '\n')
 let pass = 0
 let fail = 0
 const ok = (cond, name) => { if (cond) { pass++; console.log('  ok - ' + name) } else { fail++; console.error('  FAIL - ' + name) } }
@@ -89,7 +93,7 @@ console.log('[A] #260 OBS-01：诊断日志必须**每次**越限都轮转（旧
   const cap = 2 * 1024 * 1024
   try {
     const first = await loadEngine()
-    const logFile = path.join(root, 'dsh-auto-memory-diagnose.log')
+    const logFile = path.join(root, 'dsh-personalised-diagnose.log')
     writeFileSync(logFile, Buffer.alloc(cap + 1, 65))
     first.diag('first rotation')
     await first.flushDiagnostics()
@@ -98,11 +102,11 @@ console.log('[A] #260 OBS-01：诊断日志必须**每次**越限都轮转（旧
     await first.flushDiagnostics()
     ok(statSync(logFile).size <= cap, '第 2 次越限仍轮转：当前文件回到 ≤ 上限（实 ' + statSync(logFile).size + ' B）')
     ok(readFileSync(logFile + '.1', 'utf8').includes('second rotation'), '轮转内容真的落到 .1（不是空转）')
-    eq(readdirSync(root).sort(), ['dsh-auto-memory-diagnose.log', 'dsh-auto-memory-diagnose.log.1'], '只保留当前 + 1 份历史（不无限增长）')
+    eq(readdirSync(root).sort(), ['dsh-personalised-diagnose.log', 'dsh-personalised-diagnose.log.1'], '只保留当前 + 1 份历史（不无限增长）')
 
     // 负路径：把产线写法改回「首次轮转成功即永久跳过」——同一夹具下必须复现越限增长。
     const mutantRoot = mkroot('diag-mut')
-    const mLog = path.join(mutantRoot, 'dsh-auto-memory-diagnose.log')
+    const mLog = path.join(mutantRoot, 'dsh-personalised-diagnose.log')
     for (const k of ['HOME', 'USERPROFILE', 'DSH_HOME']) process.env[k] = mutantRoot
     const mut = await loadEngine([[
       '_diagRotated = rotateDiagLogIfNeeded(Buffer.byteLength(line, \'utf8\')) || _diagRotated',
@@ -162,7 +166,7 @@ console.log('[B] #269：worker 健康探测必须监听子进程异步 error（�
     const onUncaught = (e) => { uncaught.push(e) }
     process.on('uncaughtException', onUncaught)
     const mut = await loadEngine([[
-      "      proc.on('error', noteChildError)\r\n",
+      "      proc.on('error', noteChildError)" + eolFor("      proc.on('error', noteChildError)"),
       '',
     ]])
     const mutEffects = []
@@ -277,7 +281,7 @@ console.log('[D] #253 RL-03：会话销毁必须清理 Context Host 侧状态')
     eq(notifications.filter(n => n.type === 'close_session').length, 2, '两个会话各通知一次')
 
     const mut = await loadEngine([
-      ["    try { if (this._contextHost) this._contextHost.disposeRuntime(runtime) } catch (e) {}\r\n", ''],
+      ["    try { if (this._contextHost) this._contextHost.disposeRuntime(runtime) } catch (e) {}" + eolFor("    try { if (this._contextHost) this._contextHost.disposeRuntime(runtime) } catch (e) {}"), ''],
     ])
     const mEffects = []
     let mCaptured = null

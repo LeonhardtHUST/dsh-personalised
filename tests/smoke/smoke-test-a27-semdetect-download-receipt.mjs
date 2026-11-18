@@ -59,11 +59,15 @@ const React = {
     if (!old || deps.some((d, n) => !Object.is(d, old[n]))) { states[i] = deps; effects.push(fn) }
   },
 }
+// R2026-11-18: dsh-personalised canonical identity/config migration or native-solid layer
+// 旧键只在「迁移来源」位置保留：首次加载时 dsh-auto-memory.* 必须复制成 dsh-personalised.*（旧键不删，供回退）。
 const lsStore = { 'dsh-auto-memory.presentation.v1': 'instrument' }
 const localStorage = {
   getItem: (k) => (k in lsStore ? lsStore[k] : null),
   setItem: (k, v) => { lsStore[k] = String(v) },
-  removeItem: (k) => { delete lsStore[k] }, length: 0,
+  removeItem: (k) => { delete lsStore[k] },
+  get length() { return Object.keys(lsStore).length },
+  key: (i) => Object.keys(lsStore)[i] ?? null,
 }
 const document = {
   documentElement: { getAttribute: () => '', style: { setProperty() {}, colorScheme: '' }, classList: { contains: () => false } },
@@ -90,6 +94,9 @@ const test = exposed && exposed._a27
 ok(!!test && typeof test.DialogHost === 'function', 'factory 真执行成功，DialogHost 可调用（运行时守卫，非静态断言）')
 ok(!!test && typeof test.setDialog === 'function', 'factory 真执行成功，setDialog 可注入弹窗状态')
 ok(!!test && typeof test.getDialog === 'function', 'factory 真执行成功，getDialog 可观测单例队列状态')
+ok(lsStore['dsh-personalised.presentation.v1'] === 'instrument' &&
+  lsStore['dsh-auto-memory.presentation.v1'] === 'instrument',
+'★迁移用例：factory 执行时把旧浏览器状态 dsh-auto-memory.* 复制成 canonical dsh-personalised.*，旧键保留供回退')
 
 // ───────────────────────── 树工具 ─────────────────────────
 function nodes(tree, predicate, out = []) {
@@ -174,7 +181,7 @@ function openSemSetup() {
 // ───────────────────────── ① 正路径：start 失败 ⇒ 真点「立即下载」⇒ 渲染树里出现 notice 回执 ─────────────────────────
 {
   postCalls.length = 0
-  delete lsStore['dsh-auto-memory.semDetectSnoozeUntil']
+  delete lsStore['dsh-personalised.semDetectSnoozeUntil']
   postImpl = async () => { throw Object.assign(new Error('already running'), { response: { ok: false, reason: 'already-running' } }) }
   let tree = openSemSetup()
   const downloadBtn = findButton(tree, '立即下载')
@@ -195,7 +202,7 @@ function openSemSetup() {
     ok(text.indexOf('已有下载在进行中') >= 0, '★正路径：already-running 被译成人话「已有下载在进行中」（不是裸码）')
     ok(text.indexOf('already-running') < 0, '★正路径：用户可见文案里不出现裸错误码 already-running')
     ok(text.indexOf('语义模型下载未启动') >= 0, '★正路径：notice 标题说明「语义模型下载未启动」')
-    ok(!!lsStore['dsh-auto-memory.semDetectSnoozeUntil'], '★正路径：失败分支同样写下 24h 免打扰（localStorage semDetectSnoozeUntil）')
+    ok(!!lsStore['dsh-personalised.semDetectSnoozeUntil'], '★正路径：失败分支同样写下 24h 免打扰（localStorage semDetectSnoozeUntil）')
   }
   semSetDialog(null)
   renderDialog()
@@ -204,7 +211,7 @@ function openSemSetup() {
 // ───────────────────────── ② 负路径：post 正常 resolve ⇒ 绝不出现下载失败文案（防把成功当失败） ─────────────────────────
 {
   postCalls.length = 0
-  delete lsStore['dsh-auto-memory.semDetectSnoozeUntil']
+  delete lsStore['dsh-personalised.semDetectSnoozeUntil']
   postImpl = async () => ({ ok: true, started: true })
   let tree = openSemSetup()
   const downloadBtn = findButton(tree, '立即下载')
@@ -220,7 +227,7 @@ function openSemSetup() {
     ok(text.indexOf('已有下载在进行中') < 0, '★负路径②：成功返回时不出现 already-running 文案')
     ok(noticeDialogs(tree).length === 0, '★负路径②：成功返回时不弹失败 notice（弹窗应静默关闭）')
     ok(test.getDialog() === null, '★负路径②：成功返回时单例队列为空（dialogState===null），未入队任何 notice（实际 ' + JSON.stringify(test.getDialog()) + '）')
-    ok(!!lsStore['dsh-auto-memory.semDetectSnoozeUntil'], '★负路径②：成功分支也写 24h 免打扰（两分支共用 sdSnoozeOnce）')
+    ok(!!lsStore['dsh-personalised.semDetectSnoozeUntil'], '★负路径②：成功分支也写 24h 免打扰（两分支共用 sdSnoozeOnce）')
     ok(tree === null, '★负路径②：弹窗关闭后 DialogHost 渲染为 null（semSetup 真被关掉、不留残影）')
   }
   semSetDialog(null)

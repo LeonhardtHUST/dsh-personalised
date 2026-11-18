@@ -42,8 +42,8 @@ dsh web --no-open
 
 | 内容 | 默认位置 |
 |---|---|
-| 配置 | `<DSH_HOME>/dsh-auto-memory.json` |
-| 诊断日志 | `<DSH_HOME>/dsh-auto-memory-diagnose.log`，与 memory 同级 |
+| 配置 | `<DSH_HOME>/dsh-personalised.json` |
+| 诊断日志 | `<DSH_HOME>/dsh-personalised-diagnose.log`，与 memory 同级 |
 | 用户记忆 | `~/.dsh/memory/MEMORY.md` |
 | 工作区记忆 | `~/.dsh/memory/workspaces/<工作区键>/` |
 | 白板与账本 | 工作区记忆下 `handoff/PLAN.md`、`handoff-*.md` |
@@ -51,7 +51,7 @@ dsh web --no-open
 | 证据事件 | 默认 `~/.dsh/memory/evidence/events/YYYY-MM-DD.jsonl` |
 | 降级台账 | memory 数据根下 `degrade/`，见 `lib/datadir.js` |
 
-备份前读取 `/api/dsh-auto-memory/config` 与 `/state` 的实际路径；备份实际数据和配置。原文、锚点、sidecar 与目录身份相互关联，不能只复制一份摘要后删除原始目录。导入先预演，再核对冲突策略与备份位置。
+备份前读取 `/api/dsh-personalised/config` 与 `/state` 的实际路径；备份实际数据和配置。原文、锚点、sidecar 与目录身份相互关联，不能只复制一份摘要后删除原始目录。导入先预演，再核对冲突策略与备份位置。
 
 默认开关和水位模式见[源码速查](SOURCE-REFERENCE.md)；实际值查 `/config` 与 `/state`。
 
@@ -88,17 +88,17 @@ try {
 
 ### 5.1 主要端点（普通插件共 **82** 条）
 
-普通接口前缀为 `/api/dsh-auto-memory/`；[源码速查](SOURCE-REFERENCE.md)指向完整 API 声明。
+普通接口前缀为 `/api/dsh-personalised/`（旧 `/api/dsh-auto-memory/` 作为同 handler 别名保留）；[源码速查](SOURCE-REFERENCE.md)指向完整 API 声明。
 
 HTTP 方法、字段及写入门以对应 handler 为准；只读核对可先取 `/state` 与 `/config`。
 
-`GET /api/dsh-auto-memory/debug` 的 `maintenanceTasks` 提供本进程最近一次固化和维护回执，包括任务键、尝试时间、运行状态、确认写入数和脱敏错误。`failed` 表示未确认写入，`partial` 表示已有写入后仍存在失败。定时任务每天只自动尝试一次，避免重复模型调用或重复部分写入；排除故障后，可显式使用 `memory_consolidate` 或 `memory_maintain` 恢复。相同会话和工作区的恢复回执带 `recoveryOf`。回执随进程重启清空，开始和终结状态也写入既有诊断日志。
+`GET /api/dsh-personalised/debug` 的 `maintenanceTasks` 提供本进程最近一次固化和维护回执，包括任务键、尝试时间、运行状态、确认写入数和脱敏错误。`failed` 表示未确认写入，`partial` 表示已有写入后仍存在失败。定时任务每天只自动尝试一次，避免重复模型调用或重复部分写入；排除故障后，可显式使用 `memory_consolidate` 或 `memory_maintain` 恢复。相同会话和工作区的恢复回执带 `recoveryOf`。回执随进程重启清空，开始和终结状态也写入既有诊断日志。
 
 ## 真实宿主验证
 
 使用隔离 profile / home 和测试素材，记录代码身份、监听地址与实际加载路径。
 
-1. 启动后核对插件加载、`GET /api/dsh-auto-memory/state` 与诊断日志。
+1. 启动后核对插件加载、`GET /api/dsh-personalised/state` 与诊断日志。
 2. 写入一条测试记忆，检索并按锚点展开；重启后确认原文与证据仍可读。
 3. 改设置前后对比配置返回值、UI 和磁盘状态，核对实际语义档位和降级原因。
 4. 在真实宿主打开、关闭、重新打开面板；UI 改动需要截图、计算样式与 `getBoundingClientRect()` 验证尺寸和位置。

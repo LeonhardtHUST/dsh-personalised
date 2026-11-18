@@ -58,7 +58,10 @@ for (const sel of ['[data-native-continuation]', '[data-native-dialog]', '.i5-na
   const nFrozen = cnt(frozen, '[data-native-continuation]')
   ok(nFrozen === 0, '①-4 冻结表本身仍 0 命中（证明补丁来自附加表，未改动冻结源）')
   // #282 硬要求：变体表一字节不变 —— 用选择器计数与总长度双证
-  ok(cnt(variant, '[data-native-continuation]') === 1 && cnt(variant, '.i5-native-notice') === 8, '①-5 变体表计数保持 1/8（iter5 档未受影响）')
+  // R2026-11-18: dsh-personalised canonical identity/config migration or native-solid layer
+  // 统一 solid 层给变体表各加 1 条规则（旧 1/8 → 实测 2/9）；判据意图不变：旧档补丁只落在附加表，
+  // 不得改写冻结源；变体表只随统一的 native-solid 层整体 +1。
+  ok(cnt(variant, '[data-native-continuation]') === 2 && cnt(variant, '.i5-native-notice') === 9, '①-5 变体表计数 2/9（统一 solid 层各 +1；冻结源仍不受旧档补丁影响）')
 }
 
 /* ---------- #283 ---------- */

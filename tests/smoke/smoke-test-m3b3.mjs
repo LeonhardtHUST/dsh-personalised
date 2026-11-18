@@ -50,7 +50,11 @@ if (registeredTools.length !== 20) throw new Error('expected 20 tools (19 legacy
 // ★2026-10-01 再演进：68→69（新增 /global-brief，全球动态简报批）。
 // ★2026-10-02 再演进：69→70（审计修复批 #174 新增 POST /team-control，loopback-only，无条件注册）。
 // ★issue #211（2026-10-04）再演进：70→71（新增 POST /python-setup/uninstall，无条件注册）。
-if (registeredRoutes.length !== 82) throw new Error('expected 82 routes (73 legacy + 9 dsh-personalised API), got ' + registeredRoutes.length)
+// R2026-11-18: dsh-personalised canonical identity/config migration or native-solid layer
+// 逻辑路由 82（canonical 主表）；兼容层按旧前缀再注册一份同 handler 别名 ⇒ 实际 164。行为断言继续跑。
+const logicalRoutes = registeredRoutes.filter((r2) => r2.path.startsWith('/api/dsh-personalised/'))
+if (logicalRoutes.length !== 82) throw new Error('expected 82 logical routes (canonical dsh-personalised table), got ' + logicalRoutes.length)
+if (registeredRoutes.length !== 164) throw new Error('expected 164 registered routes (82 canonical + 82 legacy alias), got ' + registeredRoutes.length)
 
 const cfgRoute = registeredRoutes.find((r2) => r2.path === '/api/dsh-auto-memory/config')
 let body

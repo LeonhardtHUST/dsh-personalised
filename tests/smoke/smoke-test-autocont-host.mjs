@@ -22,6 +22,7 @@ import { shouldArmAutoContinuePre } from '../../lib/water-window.js'
 // 表现为"接续静默不生效"。
 import { contTitleStampPre } from '../../lib/index.js'
 import { continuationProbePre, continuationRitualEndPre } from '../../lib/continuation.js'
+import { compatibleRoutes } from '../../lib/personal/legacy-migration.js'
 
 const HERE = path.dirname(fileURLToPath(import.meta.url))
 const SRC = readFileSync(path.resolve(HERE, '..', '..', 'lib', 'index.js'), 'utf8')
@@ -61,8 +62,20 @@ ok(SRC.includes('async decideAutoContinue(action, edgeAt, sessionId) {'), 'decid
 ok(/engine\.checkWaterLevel\(agent\)\.then\(function \(\) \{/.test(SRC) && /engine\.armAutoContinue\(agent, \{ ratio: rt2\.waterLevel/.test(SRC),
   'turn-stopping 在 checkWaterLevel 完成后 arm(宿主兜底接线)')
 ok(/void engine\.tickAutoContinue\(\)/.test(SRC), '心跳定时器调用 tickAutoContinue')
-ok(SRC.includes("'auto-continue-state': '/api/dsh-auto-memory/auto-continue-state'") && SRC.includes("'auto-continue-decide': '/api/dsh-auto-memory/auto-continue-decide'"),
-  'API 常量定义存在')
+// R2026-11-18: dsh-personalised canonical identity/config migration or native-solid layer
+// 主表是 canonical /api/dsh-personalised；旧 /api/dsh-auto-memory 由 compatibleRoutes 生成同 handler 别名。
+ok(SRC.includes("'auto-continue-state': '/api/dsh-personalised/auto-continue-state'") && SRC.includes("'auto-continue-decide': '/api/dsh-personalised/auto-continue-decide'"),
+  'API 常量定义存在（canonical 主表）')
+ok(/for \(const route of compatibleRoutes\(routes\)\) disposers\.push\(ctx\.webServer\.register\(route\)\)/.test(SRC),
+  '路由注册经 compatibleRoutes 兼容层（canonical 主表 + 旧前缀同 handler 别名）')
+{
+  const [, aState] = compatibleRoutes([{ path: '/api/dsh-personalised/auto-continue-state', handler: 'h1' }])
+  const [, aDecide] = compatibleRoutes([{ path: '/api/dsh-personalised/auto-continue-decide', handler: 'h2' }])
+  ok(aState.path === '/api/dsh-auto-memory/auto-continue-state' && aState.handler === 'h1',
+    '别名行为：auto-continue-state 旧路径映射到同一 handler（不是另写一份）')
+  ok(aDecide.path === '/api/dsh-auto-memory/auto-continue-decide' && aDecide.handler === 'h2',
+    '别名行为：auto-continue-decide 旧路径映射到同一 handler（不是另写一份）')
+}
 ok(SRC.includes("path: API['auto-continue-state']") && SRC.includes("path: API['auto-continue-decide']"), '路由注册存在')
 ok(/ctx\.get\('sessionController'\)/.test(SRC), '经 ctx.get(sessionController) 直调官方会话服务')
 

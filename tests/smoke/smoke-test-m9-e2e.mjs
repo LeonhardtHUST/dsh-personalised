@@ -68,6 +68,11 @@ import {
 //   fail-soft catch 吞掉，表现为「迁移没发生」（症状离真因很远）。按本文件既有纪律
 //   **注入真实实现**（不打桩）；真实锁会以配置文件所在目录为锁目录，本用例天然隔离。
 import { withConfigLockSync, withConfigLock, readConfigSnapshot } from '${pathToFileURL(path.resolve('lib', 'config-lock.js')).href}'
+// R2026-11-18: dsh-personalised canonical identity/config migration or native-solid layer
+// loadConfigSync / persistConfigSyncPre 现经 migrateLegacyConfigSync 读 canonical 配置（缺失时从旧名安全迁移）。
+// 切片模块同样缺这个模块作用域符号 ⇒ 与 #82 / B-1b 同型：ReferenceError 被 fail-soft catch 吞掉，
+// 表现为「迁移没发生 / 磁盘没落盘」。按本文件既有纪律注入**真实 helper**（不打桩，迁移行为保真）。
+import { migrateLegacyConfigSync } from '${pathToFileURL(path.resolve('lib', 'personal', 'legacy-migration.js')).href}'
 const DEFAULT_NOTE_CAPACITY_CHARS = ${NOTE}
 const DEFAULT_USER_CAPACITY_CHARS = ${USER}
 const DEFAULT_CAPACITY_CHARS_PREV = ${PREV}

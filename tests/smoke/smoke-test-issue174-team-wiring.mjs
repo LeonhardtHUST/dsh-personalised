@@ -17,6 +17,9 @@ let holdPush=null,holdPull=null,pullChanges=null
 MemoryEngine.prototype.loadConfigSync = function () { engine = this; return load.call(this) }
 process.env.DSH_HOME = root
 try {
+ // R2026-11-18: dsh-personalised canonical identity/config migration or native-solid layer
+ // 首份夹具故意写旧文件 dsh-auto-memory.json：验证首次启动的安全迁移（旧 → canonical）；
+ // canonical 文件出现后即权威，后续 teamEnabled 开关一律写 canonical。
  await writeFile(path.join(root,'dsh-auto-memory.json'), JSON.stringify({ teamEnabled:true,teamServerUrl:'http://fake.invalid',teamId:'test-team',teamMemberId:'member-a',teamMemberName:'Alice',memoryRoot:path.join(root,'memory'),userMemoryDir:path.join(root,'user'),globalBriefEnabled:false,externalSources:{} }))
  globalThis.setInterval = globalThis.setTimeout = (callback,ms) => { const t={callback,ms,unref(){}};timers.push(t);return t }
  globalThis.fetch = async (url,opts) => {
@@ -105,12 +108,13 @@ try {
  const stoppedAt=network.length;retiredPull.callback();for(const timer of oldSyncTimers)timer.callback();await retiredSync.tick();await new Promise(r=>timeout(r,0));assert.equal(network.length,stoppedAt);assert.equal(retiredSync.status().running,false)
  network=[];
 timers.length=0;routes.length=0
- await writeFile(path.join(root,'dsh-auto-memory.json'),JSON.stringify({teamEnabled:false,memoryRoot:path.join(root,'memory'),userMemoryDir:path.join(root,'user'),globalBriefEnabled:false}))
+ // canonical 存在后即权威：后续开关必须写 canonical 文件，写旧文件不会再生效。
+ await writeFile(path.join(root,'dsh-personalised.json'),JSON.stringify({teamEnabled:false,memoryRoot:path.join(root,'memory'),userMemoryDir:path.join(root,'user'),globalBriefEnabled:false}))
  globalThis.setInterval=globalThis.setTimeout=(callback,ms)=>{const t={callback,ms,unref(){}};timers.push(t);return t}
  apply({get:()=>undefined,on:()=>{},systemPrompt:{context:()=>()=>{},section:()=>()=>{}},tools:{register:()=>()=>{}},webServer:{register:r=>{routes.push(r);return()=>{}}},effect:f=>{cleanup=f()}},{})
  assert.equal(engine._teamPull,undefined);assert.equal(engine._teamSync,undefined);assert.equal(engine._teamPullTimer,undefined);assert.equal(network.length,0)
  cleanup();cleanup=null;timers.length=0;routes.length=0
- await writeFile(path.join(root,'dsh-auto-memory.json'),JSON.stringify({teamEnabled:true,teamServerUrl:'http://fake.invalid',teamId:'test-team',teamMemberId:'member-a',memoryRoot:path.join(root,'memory'),userMemoryDir:path.join(root,'user'),globalBriefEnabled:false}))
+ await writeFile(path.join(root,'dsh-personalised.json'),JSON.stringify({teamEnabled:true,teamServerUrl:'http://fake.invalid',teamId:'test-team',teamMemberId:'member-a',memoryRoot:path.join(root,'memory'),userMemoryDir:path.join(root,'user'),globalBriefEnabled:false}))
  apply({get:()=>undefined,credentials:{teamToken:'test-token'},on:()=>{},systemPrompt:{context:()=>()=>{},section:()=>()=>{}},tools:{register:()=>()=>{}},webServer:{register:r=>{routes.push(r);return()=>{}}},effect:f=>{cleanup=f()}},{})
  assert.equal(engine._teamOutbox.size(),2);assert.ok(engine._teamPullTimer);assert.equal(timers.filter(t=>t===engine._teamPullTimer).length,1)
  retiredPull.callback();await retiredSync.tick();assert.equal(network.length,0)

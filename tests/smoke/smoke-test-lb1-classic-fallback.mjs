@@ -44,7 +44,7 @@ const overlayRaw = readFileSync(OVERLAY, 'utf8')
 //   否则「解释缺陷的注释」本身会把判据喂红（实测：注释里引用旧写法即误报 2 处）。
 const overlay = overlayRaw.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:]) \/\/[^\n]*/g, '$1')
 
-/* ---------- 白名单：冻结表里定义的 43 个自定义属性 ---------- */
+/* ---------- 白名单：冻结表里定义的 38 个自定义属性 ---------- */
 function definedTokens (css) {
   const set = new Set()
   // 定义＝形如 --x: value（出现在声明位置），引用 var(--x) 不算
@@ -55,7 +55,9 @@ function definedTokens (css) {
   return set
 }
 const WHITELIST = definedTokens(frozenCss)
-const LEAD_SAID = 43
+// R2026-11-18: dsh-personalised canonical identity/config migration or native-solid layer
+// 冻结 legacy 表的真实定义数（去 solid 层重整后实测 38；原 43 是旧口径）。B 段「反向 alias 禁用」判据不动。
+const LEAD_SAID = 38
 
 console.log('')
 console.log('[L-B1] 白名单（冻结 legacy 表定义的自定义属性）')

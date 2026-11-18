@@ -312,7 +312,8 @@ t('F2 看板投影确定性(打乱输入顺序 → 输出仍逐字节相同; 同
 
 t('F3 宿主侧 kanbanBoardData 挂载 + REST 路由 + 两侧路径表同步', () => {
   assert(IDX_SRC.includes('async kanbanBoardData('), 'kanbanBoardData 方法不在场')
-  assert(IDX_SRC.includes("'kanban-board': '/api/dsh-auto-memory/kanban-board'"), '宿主 API 表缺 kanban-board')
+  // R2026-11-18: dsh-personalised canonical identity/config migration or native-solid layer
+  assert(IDX_SRC.includes("'kanban-board': '/api/dsh-personalised/kanban-board'"), '宿主 API 表缺 kanban-board（canonical 主表；旧前缀由 compatibleRoutes 注册别名）')
   assert(IDX_SRC.includes("path: API['kanban-board']"), 'REST 路由未注册')
   assert(CLI_SRC.includes("kanbanBoard: ROUTE_PREFIX + '/kanban-board'"), '客户端 API 表缺 kanbanBoard')
 })
@@ -409,7 +410,8 @@ t('F6 宿主侧 kanbanBoardData 挂载 + **被调符号必须已 import** + 路�
   assert(IDX_SRC.includes('_collectWhiteboardDocsPre('), '读盘必须走共用口径')
   const cn = (IDX_SRC.match(/buildSectionCardsPre\(/g) || []).length
   assert(cn >= 1, 'buildSectionCardsPre 调用点必须 >=1, 实为 ' + cn)
-  assert(IDX_SRC.includes("'kanban-board': '/api/dsh-auto-memory/kanban-board'"), '宿主 API 表缺 kanban-board')
+  // R2026-11-18: dsh-personalised canonical identity/config migration or native-solid layer
+  assert(IDX_SRC.includes("'kanban-board': '/api/dsh-personalised/kanban-board'"), '宿主 API 表缺 kanban-board（canonical 主表；旧前缀由 compatibleRoutes 注册别名）')
   assert(IDX_SRC.includes("path: API['kanban-board']"), 'REST 路由未注册')
   assert(CLI_SRC.includes("kanbanBoard: ROUTE_PREFIX + '/kanban-board'"), '客户端 API 表缺 kanbanBoard')
   // ★ 2026-09-16 晚补(真实事故): 上面全是「文本在场」, 抓不到 ReferenceError。
@@ -481,7 +483,8 @@ t('F7 前端 v2 交互: 缩放(字号+列宽) + 布局切换 + 展开全文 + �
 t('G1 前端注册 conversation.view 槽位(整页看板唯一落点)', () => {
   assert(CLI_SRC.includes("slots.inject('conversation.view'"), '必须 inject conversation.view —— 否则整页看板永不出现(「函数写了没人调用」的老病)')
   assert(/slots\.register\(\s*\{\s*name:\s*'conversation\.view'/.test(CLI_SRC), "register 的 name 必须是 'conversation.view'(与 inject 同名)")
-  assert(/id:\s*'auto-memory-pre-kanban'/.test(CLI_SRC), '槽位 id 不在场')
+  // R2026-11-18: dsh-personalised canonical identity/config migration or native-solid layer
+  assert(/id:\s*'personalised-kanban'/.test(CLI_SRC), '槽位 id 不在场（canonical personalised-kanban）')
   // ★2026-09-28 放宽为形态无关：label 仍必须是**跟随语言的函数**（这是原意，未变），
   //   但函数体可以是三元或 L()（内联文案已统一走 L）。
   assert(/label:\s*function\s*\(\)\s*\{\s*return\s+(?:locale\s*===\s*'zh'|L\()/.test(CLI_SRC), 'label 必须是 locale 跟随函数（形态无关；否则显示 undefined/切语言不重算）')

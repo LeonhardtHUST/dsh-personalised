@@ -48,7 +48,16 @@ function runClientFactory (code, storage) {
 /** 造一份独立的 localStorage 替身（用例之间互不污染）。 */
 function freshStorage () {
   const m = new Map()
-  return { getItem: (k) => (m.has(k) ? m.get(k) : null), setItem: (k, v) => m.set(k, String(v)), removeItem: (k) => m.delete(k), clear: () => m.clear(), _map: m }
+  // R2026-11-18: 补 length/key()，让 factory 里的浏览器状态迁移（旧 dsh-auto-memory.* → canonical）真的可跑。
+  return {
+    getItem: (k) => (m.has(k) ? m.get(k) : null),
+    setItem: (k, v) => m.set(k, String(v)),
+    removeItem: (k) => m.delete(k),
+    clear: () => m.clear(),
+    get length() { return m.size },
+    key: (i) => Array.from(m.keys())[i] ?? null,
+    _map: m,
+  }
 }
 
 function extractFnBody (src, header) {
@@ -111,7 +120,9 @@ const statusOf = (v) => (v && v.props && typeof v.props.status === 'string') ? v
 const isOkShown = (v) => { const s = statusOf(v); return !!s && s.indexOf(String.fromCharCode(10003)) === 0 }
 const NOW = Date.now()
 const okState = (at, sid) => ({ executing: false, lastOk: { at, sessionId: sid, model: 'm1', reasoningEffort: 'high' }, error: null, armed: null })
-const DISMISS_KEY = 'dsh-auto-memory.acDismissedOk'
+// R2026-11-18: dsh-personalised canonical identity/config migration or native-solid layer
+// 关闭身份落盘键改为 canonical；旧键只作为一次性迁移来源（文件末尾 [F] 段新增迁移用例守住）。
+const DISMISS_KEY = 'dsh-personalised.acDismissedOk'
 
 const R = runClientFactory(SRC, freshStorage())
 ok(!R.topErr, '① 真跑 client.js 顶栏不抛（' + (R.topErr ? R.topErr.message : 'ok') + '）')
@@ -386,6 +397,20 @@ console.log('[I] H1/H3 断言的鉴别力验证（变异必红）')
   })
   hI2.show(); hI2.runEffects(); await hI2.settle()
   ok(openedI2.length === 1, '★ I2 退回 sidQ => 会话已切走仍**发生跳转**（H3 必红 ⇒ 行为级判据有鉴别力）实=' + JSON.stringify(openedI2))
+}
+
+
+console.log('[F] 旧浏览器状态首次迁移（canonical 身份）')
+{
+  // R2026-11-18: dsh-personalised canonical identity/config migration or native-solid layer
+  const LEGACY_DISMISS_KEY = 'dsh-auto-memory.acDismissedOk'
+  const legacyIdentity = JSON.stringify({ at: NOW, sessionId: 'sid-A' })
+  const store = freshStorage()
+  store.setItem(LEGACY_DISMISS_KEY, legacyIdentity)
+  const R2 = runClientFactory(SRC, store)
+  ok(!R2.factoryErr, '旧键夹具下 factory 仍可执行')
+  ok(store.getItem(DISMISS_KEY) === legacyIdentity, '旧键 dsh-auto-memory.acDismissedOk 迁移为 canonical dsh-personalised.acDismissedOk')
+  ok(store.getItem(LEGACY_DISMISS_KEY) === legacyIdentity, '旧键保留（供回退，迁移不删用户状态）')
 }
 
 console.log('')
