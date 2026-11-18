@@ -9,7 +9,8 @@
   },
   "type": "module",
   "scripts": {
-    "prepare": "vp config --no-agent",
+    "prepare": "node tools/prepare.mjs",
+    "prepublishOnly": "node --check lib/index.js && node --check lib/client.js && node tools/build-iter5-skin.mjs --check",
     "test": "node tools/run-smoke.mjs",
     "commitlint": "commitlint --edit",
     "hooks:enable": "vp hooks enable",
