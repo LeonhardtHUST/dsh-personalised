@@ -22,7 +22,7 @@ dsh-personalised 的版本记录。1.0.0 之前的版本历史见上游 https://
 
 - 包更名为 `dsh-personalised`，仓库重新定位为 DeepSeek Harness 个性化插件。
 - 适配 DSH `>=0.2.2-rc.3 <0.3.0`（rc3），客户端模块 id 改为 `dsh-personalised`，插件详情页对新旧包名都认领。
-- 路由前缀 `/api/dsh-auto-memory`、配置文件 `dsh-auto-memory.json`、数据目录 `~/.dsh/memory/` 保持旧名，从 dsh-auto-memory 换装后数据直接可用。
+- 当前源代码使用 `/api/dsh-personalised` 与 `$DSH_HOME/dsh-personalised.json`，旧路由和旧配置仅在迁移兼容层保留；记忆目录和 Workspace key 不变。npm `1.0.0` 仍使用旧路径。
 - 文档精简：重写 README 与用户手册，删除上游的宣传页、调研稿、交接记录和内部运维文档。
 
 ### 工程
