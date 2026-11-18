@@ -19,7 +19,7 @@
       var versions = props.versions || []
       return h(Iter5Dialog, { title: L('版本与更新说明', 'Version and release notes'), onClose: props.onClose },
         h('div', { className: 'i5-native-update' },
-          h('header', null, h(Iter5Icon, { name: 'note' }), h('div', null, h('h3', null, 'dsh-auto-memory'), props.version ? h('p', null, L('当前版本 ', 'Current version ') + props.version) : null)),
+          h('header', null, h(Iter5Icon, { name: 'note' }), h('div', null, h('h3', null, 'dsh-personalised'), props.version ? h('p', null, L('当前版本 ', 'Current version ') + props.version) : null)),
           h('p', { className: 'i5-muted' }, t('updateSub')),
           versions.map(function (version, i) { return h('details', { key: version.version || i, open: i === 0 },
             h('summary', null, 'v' + version.version), h('ul', null, ((version.items && (version.items[locale] || version.items.zh)) || []).map(function (item, n) { return h('li', { key: n }, item) }))) }),

@@ -94,7 +94,7 @@ async function main() {
   for (const [name] of ROUTES) {
     const camel = camelOf(name)
     ok(!!API[camel], '真 API 表含 ' + camel, API[camel])
-    ok(API[camel] === '/api/dsh-auto-memory/' + name, '真 API 表路径正确 ' + camel, API[camel])
+    ok(API[camel] === '/api/dsh-personalised/' + name, '真 API 表路径正确 ' + camel, API[camel])
   }
 
   // ② ★逐条抽取产线 handler 源码 → new Function 真构造 → 真调用

@@ -6,6 +6,7 @@
 |---|---|
 | [用户手册（中文）](USER-GUIDE.zh-CN.md) | 个性化页五个标签页、导入导出、分层与子代理策略、原有记忆功能 |
 | [User guide (English)](USER-GUIDE.en.md) | 同上 |
+| [迁移指南 / Migration](MIGRATION.md) | 从 dsh-auto-memory 升级、数据核对、换机和回退 |
 | [README](../README.zh-CN.md) / [English](../README.md) | 定位、快速开始、迁移、开发 |
 | [CHANGELOG](../CHANGELOG.md) | 版本记录 |
 

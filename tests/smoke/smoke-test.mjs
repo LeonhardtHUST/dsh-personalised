@@ -54,9 +54,9 @@ apply(ctx, {})
 
 // 审查修复轮2:先经 config 路由 await loadConfig,再执行任何工具调用,
 // 消除"首个调用按默认 '~'(真实 homedir) 解析路径"的竞态(本测试污染真实记忆的根因)。
-const configRouteEarly = registeredRoutes.find((r) => r.path === '/api/dsh-auto-memory/config')
+const configRouteEarly = registeredRoutes.find((r) => r.path === '/api/dsh-personalised/config')
 let cfgBody
-await configRouteEarly.handler({ socket: { remoteAddress: '127.0.0.1' }, headers: { host: '127.0.0.1:3080' }, method: 'GET', url: '/api/dsh-auto-memory/config' }, { writeHead() {}, end(b) { cfgBody = JSON.parse(b) } })
+await configRouteEarly.handler({ socket: { remoteAddress: '127.0.0.1' }, headers: { host: '127.0.0.1:3080' }, method: 'GET', url: '/api/dsh-personalised/config' }, { writeHead() {}, end(b) { cfgBody = JSON.parse(b) } })
 if (cfgBody.config.memoryRoot.indexOf(smkWs) !== 0) throw new Error('memoryRoot not isolated to temp dir before execution: ' + cfgBody.config.memoryRoot)
 
 console.log('name:', name, '| inject:', JSON.stringify(inject))
@@ -81,7 +81,7 @@ if (registeredTools.length !== 20) throw new Error('expected 20 tools (19 legacy
 //   teamEnabled=false 时返回 409 但**仍无条件注册**，故任何档位下都 +1）。
 // ★issue #211（2026-10-04）计数演进：70→71（新增 POST /python-setup/uninstall —— Python 引擎卸载，
 //   loopback-only，pythonBackendEnabled=false 时也**无条件注册**并可用，故任何档位下都 +1）。
-if (registeredRoutes.length !== 82) throw new Error('expected 82 routes (73 legacy + 9 dsh-personalised API), got ' + registeredRoutes.length)
+if (registeredRoutes.length !== 164) throw new Error('expected 164 routes (82 canonical + 82 legacy aliases), got ' + registeredRoutes.length)
 if (sections.length !== 2) throw new Error('expected 2 prompt sections (static rules + dsh-personalised instructions)')
 if (contexts.length !== 3) throw new Error('expected 3 dynamic contexts (memory snapshot + m6 reference tail + dsh-personalised P/W), got ' + contexts.length)
 

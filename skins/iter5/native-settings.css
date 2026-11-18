@@ -158,9 +158,7 @@
 [data-iter5][data-i5-embedded] :is(small,.i5-muted,.i5-style-picker,.i5-mode-picker,.i5-hint-more>summary){font-size:calc(var(--dsh-content-font-size,14px) * 6 / 7)!important;}
 
 /* Host settings are a neutral native form, independent of workbench materials. */
-/* Workbench aliases point DSH tokens back to i5 tokens. Restore inheritance at
-   both settings roots before consuming host tokens, avoiding circular aliases. */
-[data-dam-theme=settings],[data-dam-theme=settings] [data-iter5][data-i5-embedded]{--dsw-alias-bg-layer-1:inherit;--dsw-alias-bg-layer-2:inherit;--dsw-alias-label-primary:inherit;--dsw-alias-label-secondary:inherit;--dsw-alias-border-l1:inherit;}
+/* DSH aliases are inherited unchanged; plugin tokens only consume them. */
 [data-dam-theme=settings] [data-iter5][data-i5-embedded]{--i5-host-face-fallback:#fff;--i5-host-text-fallback:#25262a;--i5-host-secondary-fallback:#585b63;--i5-host-line-fallback:#e4e5e9;--i5-bg:var(--dsw-alias-bg-layer-2,var(--i5-host-face-fallback));--i5-face:var(--i5-bg);--i5-surface:var(--i5-bg);--i5-side:var(--i5-bg);--i5-recess:var(--i5-bg);--i5-soft:var(--dsw-alias-interactive-bg-hover,#80808014);--i5-text:var(--dsw-alias-label-primary,var(--i5-host-text-fallback));--i5-secondary:var(--dsw-alias-label-secondary,var(--i5-host-secondary-fallback));--i5-muted:var(--i5-secondary);--i5-line:var(--dsw-alias-border-l2,var(--i5-host-line-fallback));--i5-hair:var(--i5-line);--i5-bezel:var(--dsw-alias-border-l1,var(--i5-host-line-fallback));--i5-blue:var(--dsw-alias-state-business-primary,#4166e8);--i5-shadow:none;background:var(--i5-face);color:var(--i5-text);}
 [data-dam-theme=settings][data-deep=true] [data-i5-embedded]{--i5-host-face-fallback:#292a2c;--i5-host-text-fallback:#ededf0;--i5-host-secondary-fallback:#c5c6cc;--i5-host-line-fallback:#3d3f46;}
 [data-dam-theme=settings] [data-iter5][data-i5-embedded]>.i5-settings-frame-head{padding:4px 0 16px;border:0;background:var(--i5-face);gap:8px;}

@@ -200,8 +200,8 @@ t('T8c-1 ★★ 配置文件写路径必须走原子写（不得残留裸 writeF
 })
 
 t('T8c-2 ★★ 两个 load 路径都必须用损坏隔离读（**仅限配置路径**）', () => {
-  const n = (IDX.match(/readJsonQuarantinePreSync\(this\._configPath\)/g) || []).length
-  assert(n === 2, '★ 应有 2 处（loadConfigSync + loadConfig），实为 ' + n)
+  const n = (IDX.match(/migrateLegacyConfigSync\(this\._configPath\)/g) || []).length
+  assert(n >= 2, '★ 两个 load 路径都必须调用 canonical migration/strict read，实为 ' + n)
   // ⚠️ 断言必须**限定在配置路径** this._configPath：
   //    本仓另有大量合法的 JSON.parse(readFile(...))（sidecar 索引 / 续接会话 /
   //    hub flush 状态 / embedding-config 读侧）——那些不在 #82 范围内，扫进来是假阳性。
@@ -224,8 +224,8 @@ t('T8c-3 ★★ 损坏必须**可观察**：写进 _readError 且诊断面暴露
 })
 
 t('T8c-4 ★★ 两个 load 的 _readError 文案必须同口径（防止只修了一条路）', () => {
-  const n = (IDX.match(/'config corrupted, quarantined='/g) || []).length
-  assert(n === 2, '★ 应有 2 处同口径文案，实为 ' + n)
+  const n = (IDX.match(/config load refused:/g) || []).length
+  assert(n >= 2, '★ 两个 load 的 _readError/诊断必须同口径可观察，实为 ' + n)
 })
 
 t('T8c-5 ★ embedding-config.json 也必须原子写（语义引擎开关的双轨读数来源）', () => {

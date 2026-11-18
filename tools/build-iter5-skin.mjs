@@ -74,7 +74,8 @@ const legacyBody = legacySrc.slice(lbIdx, leIdx + '    // ITER5-GENERATED:END'.l
 // ★#282（2026-10-08）：经典/默认档原生浮层最小样式补丁。
 //   只附加到 legacy 表（LEGACY_ITER5_CSS）；变体表（ITER5_CSS）一字节不变 ⇒ iter5 档行为逐字节守恒。
 //   注意：此处位于 readSkin 定义之前 ⇒ 直接按同口径读文件（CRLF→LF + trim）。
-const legacyOverlayCss = readFileSync(path.join(root, 'skins/iter5/legacy-native-overlays.css'), 'utf8').replace(/\r\n/g, '\n').trim()
+const nativeSolidCss = readFileSync(path.join(root, 'skins/iter5/native-solid.css'), 'utf8').replace(/\r\n/g, '\n').trim()
+const legacyOverlayCss = readFileSync(path.join(root, 'skins/iter5/legacy-native-overlays.css'), 'utf8').replace(/\r\n/g, '\n').trim() + '\n' + nativeSolidCss
 const LEGACY_OVERLAY_EXTRA_DEF = '    var LEGACY_OVERLAY_EXTRA = ' + JSON.stringify(String.fromCharCode(10) + legacyOverlayCss + String.fromCharCode(10)) + String.fromCharCode(10)
 const legacyWrapped = legacyBegin + '\n' +
   '    // 3.2.5 的「新款」皮肤（用户裁定的默认）。整体包 IIFE：内部仍用原来的 Iter5* 名字，' + '\n' +
@@ -515,7 +516,7 @@ stats = replaceOnce(stats, "      h('div', { style: { opacity: .72, fontSize: '1
 // Zero-event channels used to repeat statsNoInject in all three cards; their own hint now carries the empty state.
 stats = replaceOnce(stats, "        : h('div', { style: { opacity: .5, fontSize: '12px' } }, t('statsNoInject'))))", "        : ch.events ? h('div', { className: 'i5-native-stat-empty' }, t('statsNoInject')) : null))")
 const readSkin = name => readFileSync(path.join(root, 'skins/iter5', name), 'utf8').replace(/\r\n/g, '\n')
-const cssRaw = (readSkin('skin.css') + '\n' + readSkin('native-tour.css') + '\n' + readSkin('native-panel.css') + '\n' + readSkin('native-settings.css') + '\n' + readSkin('native-workbench.css') + '\n' + readSkin('native-library.css') + '\n' + readSkin('native-operations.css') + '\n' + readSkin('native-secondary.css') + '\n' + readSkin('style-variants.css')).trim()
+const cssRaw = (readSkin('skin.css') + '\n' + readSkin('native-tour.css') + '\n' + readSkin('native-panel.css') + '\n' + readSkin('native-settings.css') + '\n' + readSkin('native-workbench.css') + '\n' + readSkin('native-library.css') + '\n' + readSkin('native-operations.css') + '\n' + readSkin('native-secondary.css') + '\n' + readSkin('style-variants.css') + '\n' + nativeSolidCss).trim()
 let css = replaceT(cssRaw, '[data-iter5]{--i5-blue:', '[data-iter5],[data-dam-theme]{--i5-blue:', 'G0-2/css:370 变体表浅色主题选择器前缀')
 css = replaceT(css, '[data-iter5][data-deep=true]{--i5-blue:', '[data-iter5][data-deep=true],[data-dam-theme][data-deep=true],[data-dam-theme][data-deep=true] [data-iter5]{--i5-blue:', 'G0-2/css:371 变体表深色主题选择器前缀')
 const ui = readSkin('style-choice.js').trimEnd() + '\n' + readSkin('alternate-home.js').trimEnd() + '\n' + readSkin('ui.js').trimEnd() + '\n' + readSkin('views.js').trimEnd() + '\n' + readSkin('surfaces.js').trimEnd() + '\n' + readSkin('native-panel.js').trimEnd() + '\n' + readSkin('native-workbench.js').trimEnd() + '\n' + readSkin('native-search.js').trimEnd() + '\n' + readSkin('native-skills.js').trimEnd() + '\n' + readSkin('native-storage.js').trimEnd() + '\n' + readSkin('native-team.js').trimEnd() + '\n' + readSkin('native-map.js').trimEnd() + '\n' + readSkin('native-messages.js').trimEnd()
@@ -848,7 +849,7 @@ if (!client.includes('F6 · 共享样式按皮肤分派') && !client.includes('H
         indent + "    if (!el) {",
         indent + "      el = document.createElement('style')",
         indent + "      el.id = 'dam-shared-ui-style'",
-        indent + "      el.dataset.plugin = '@a9i5k4/dsh-auto-memory'",
+        indent + "      el.dataset.plugin = 'dsh-personalised'",
         indent + "      el.textContent = damWantCss",
         indent + "      document.head.appendChild(el)",
         indent + "    } else if (el.textContent !== damWantCss) { el.textContent = damWantCss }",

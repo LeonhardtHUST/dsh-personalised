@@ -38,10 +38,9 @@ DeepSeek Harness（DSH）的个性化插件。你写一次指令、导入一次�
 
 ## 从 dsh-auto-memory 迁移
 
-1. 在 Plugins 页卸载旧的 dsh-auto-memory（包名 `@a9i5k4/dsh-auto-memory`），两个插件不要同时启用。
-2. 按上面的方式安装 dsh-personalised，重启。
+先备份配置和记忆目录，再停用旧插件、安装新插件并完全重启。不要同时启用两个插件。具体步骤、检查清单、换机操作和回退见 [迁移指南](docs/MIGRATION.md)。
 
-数据不用搬。路由前缀 `/api/dsh-auto-memory`、配置文件 `~/.dsh/dsh-auto-memory.json`、数据目录 `~/.dsh/memory/` 都保持旧名，原有记忆、日志、白板、设置直接可用。画像库是新增的，存在 `~/.dsh/memory/personal/profile.json`。
+本次源代码更新将主配置改为 `$DSH_HOME/dsh-personalised.json`，主 API 改为 `/api/dsh-personalised`。新配置不存在时才复制旧配置，旧文件和旧 API 兼容入口保留。记忆目录、Workspace key 与自定义存储路径不变。npm `1.0.0` 尚不包含这次路径迁移，试用本次更新请安装此仓库目录或包含更新的新版本。
 
 ## 兼容性
 

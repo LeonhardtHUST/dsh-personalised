@@ -158,16 +158,16 @@ AI 可直接调用，你不需要记：`memory_recall`、`memory_read`、`memory
 
 | 内容 | 路径 |
 |---|---|
-| 插件配置 | `~/.dsh/dsh-auto-memory.json` |
+| 插件配置 | `~/.dsh/dsh-personalised.json`（首次启动从旧配置迁移） |
 | 画像库 | `~/.dsh/memory/personal/profile.json` |
 | 导入备份 | `~/.dsh/memory/personal/backups/` |
 | 用户级记忆 | `~/.dsh/memory/MEMORY.md` |
 | 工作区记忆 | `~/.dsh/memory/workspaces/<工作区>/` |
 | 记忆中枢 | `~/.dsh/memory/hub/` |
 | 证据事件 | `~/.dsh/memory/evidence/events/` |
-| 诊断日志 | `~/.dsh/dsh-auto-memory-diagnose.log`（与 `memory/` 同级） |
+| 诊断日志 | `~/.dsh/dsh-personalised-diagnose.log`（与 `memory/` 同级） |
 
-设置了 `DSH_HOME` 时，以实际的宿主数据根为准。数据都在本机。路径沿用旧名，是为了让 dsh-auto-memory 的老用户直接可用。
+设置了 `DSH_HOME` 时，以实际的宿主数据根为准。配置自动复制迁移，记忆目录不搬动。升级、换机和回退前阅读 [迁移指南](MIGRATION.md)；npm `1.0.0` 仍采用旧配置路径，这里的新路径适用于包含本次更新的版本。
 
 ## 7. 常见问题
 

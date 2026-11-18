@@ -38,10 +38,9 @@ Pending entries are never injected. Subagents receive only the global instructio
 
 ## Migrating from dsh-auto-memory
 
-1. Uninstall the old dsh-auto-memory (package `@a9i5k4/dsh-auto-memory`) on the Plugins page. Do not enable both.
-2. Install dsh-personalised as above and restart.
+Back up your config and memory directories, disable the old plugin, install the new one, and fully restart DSH. Never enable both plugins together. See the [migration guide](docs/MIGRATION.md#english) for verification, moving machines and rollback.
 
-Nothing needs to move. The route prefix `/api/dsh-auto-memory`, the config file `~/.dsh/dsh-auto-memory.json` and the data directory `~/.dsh/memory/` keep their old names, so existing memory, logs, whiteboards and settings work as before. The profile store is new and lives at `~/.dsh/memory/personal/profile.json`.
+This source update uses `$DSH_HOME/dsh-personalised.json` and `/api/dsh-personalised`. The old config is copied only when the new file is absent; old files and API aliases remain available. Memory directories, Workspace keys and custom storage paths are unchanged. npm `1.0.0` does not include this path migration; install this checkout or a release containing the update.
 
 ## Compatibility
 

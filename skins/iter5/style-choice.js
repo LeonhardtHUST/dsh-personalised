@@ -1,4 +1,4 @@
-    var ITER5_STYLE_KEY = 'dsh-auto-memory.presentation.v1'
+    var ITER5_STYLE_KEY = 'dsh-personalised.presentation.v1'
     // ★2026-09-30（用户裁定）：下拉框同管**四款**——旧款（3.2.5 的「新款」，默认）
     //   + 仪器 / 编辑 / 活水三套变体。旧款不属于本块的样式系统，
     //   故它改变的是**挂载点分派**（damSkinStyleSet）而非样式变量；
@@ -46,7 +46,7 @@
       return h('select', { className: 'i5-style-picker', 'aria-label': labels[0], title: labels[0], value: value, onChange: function (e) { iter5SetStyle(e.target.value) } }, ITER5_ALL_SKINS.map(function (id, i) { return h('option', { key: id, value: id }, labels[i + 1]) }))
     }
 
-    var ITER5_MODE_KEY = 'dsh-auto-memory.appearance.v1'
+    var ITER5_MODE_KEY = 'dsh-personalised.appearance.v1'
     // ★H36（2026-10-01）：3.2.5 冻结页与本块原本各读各的主题键 ⇒ 同一「深/浅」两处不一致
     //   （用户实报「明暗不同、亮暗没有正常转化」）。此键是冻结页的存储键，本块**双向镜像**它：
     //   写时同步写、storage 事件时反向采纳，两键恒等 ⇒ 一处切换处处一致（L10374 契约）。

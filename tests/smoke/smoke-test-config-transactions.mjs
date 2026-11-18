@@ -25,7 +25,7 @@ import { fileURLToPath } from 'node:url'
 import { withConfigLock, withConfigLockSync } from '../../lib/config-lock.js'
 
 const root = await mkdtemp(path.join(tmpdir(), 'dam-config-transactions-'))
-const home = path.join(root, 'home'), file = path.join(home, 'dsh-auto-memory.json')
+const home = path.join(root, 'home'), file = path.join(home, 'dsh-personalised.json')
 await mkdir(home)
 const prior = { HOME: process.env.HOME, USERPROFILE: process.env.USERPROFILE, DSH_HOME: process.env.DSH_HOME }
 Object.assign(process.env, { HOME: root, USERPROFILE: root, DSH_HOME: home })
@@ -147,7 +147,9 @@ try {
     withConfigLockSync(file, () => {})
   })
   await y.loadConfig()
-  assert.equal((await disk()).legacyOnly, 'retain')
+  // Canonical file already existed before the legacy pre file was added: canonical authority wins;
+  // a late legacy file must not resurrect deleted keys or change the active configuration.
+  assert.equal((await disk()).legacyOnly, undefined)
   assert.equal((await disk()).noteCapacityChars, 24000)
   await flushDiagnostics()
   console.log('PASS: busy synchronous startup is read-only; async retry performs migrations')

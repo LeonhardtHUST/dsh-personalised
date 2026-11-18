@@ -35,7 +35,7 @@ dsh-personalised = DeepSeek Harness 个性化插件。原 dsh-auto-memory 的记
   - `instructions`（默认）：只给 G 层，且仅当 `customInstructionsSubagents=true`；不给 P/W。
   - `none`：什么都不给。
   - `all`：G + P + W（W 按子代理自己的 cwd 判定）。
-- 本插件自己 spawn 的后台子代理（`auto-memory-*` 标签）一律不注入 P/W。
+- 本插件自己 spawn 的后台子代理（新 `personalised-*`、兼容旧 `auto-memory-*` 标签）一律不注入 P/W。
 
 ## 3. 数据模型
 
@@ -84,7 +84,9 @@ G 层只收 `kind=instruction && scope.global && priority!=='low'`；低优先�
 
 ## 5. Host 路由（全部 loopback-only，JSON；API 表键名 → 路径）
 
-前缀沿用 `/api/dsh-auto-memory`（为兼容旧数据与旧测试，不改名）。
+主前缀为 `/api/dsh-personalised`。旧 `/api/dsh-auto-memory` 由统一兼容映射注册为同处理器别名，保留方法、请求体和访问检查，不使用重定向。新浏览器代码只使用主前缀。
+
+配置主文件为 `$DSH_HOME/dsh-personalised.json`。仅在主文件不存在时，在配置事务内读取旧 `dsh-auto-memory.json` 和更早的 `-pre` 配置，普通旧配置优先。旧文件只读保留；主文件存在（包括空对象）后不再从旧文件补键。数据目录和 Workspace key 不变。迁移与回退操作见 [MIGRATION.md](../MIGRATION.md)。
 
 | API 键 | 方法 & 路径 | 请求 | 响应 |
 |---|---|---|---|
@@ -137,3 +139,9 @@ G 层只收 `kind=instruction && scope.global && priority!=='low'`；低优先�
 5. 分层：P/W 注入模式、top-K、预算、子代理策略、旧 MEMORY.md 注入模式；“上下文预览”输入一句话看三层将注入什么。
 
 写配置统一走现有 `saveConfigPatch`；模型列表复用 GET `/models`。
+
+### 原生 solid 浮层
+
+所有插件内容浮层使用宿主主题的不透明表面，继承原生边框、字体、圆角和阴影令牌。经典档与变体档走同一最终表面样式层，覆盖面板、通知、向导、对话框、菜单、提示及固定保存栏；不得以皮肤透明度、背景图或模糊重新改变浮层透明度。
+
+宿主遮罩、阴影和透明布局容器允许保留相应语义；它们不等同于内容表面。插件不得定义宿主 `--dsw-alias-*` 来反向覆盖主题，避免局部皮肤污染其他组件。资源只在存在真实消费引用时打包；删除装饰图必须同步清单与回归。

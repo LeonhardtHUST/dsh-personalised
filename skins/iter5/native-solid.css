@@ -1,0 +1,67 @@
+/* Current personalised contract: native opaque surfaces in every skin.
+ * Palette: installed ui-theme design-platform.css bg-layer-2 / border-l2 /
+ * label-primary / bg-mask-1. Radius: base.css sm=8 md=12 lg=16 panel=28.
+ * MenuSurface's native fill is translucent: deliberately use bg-layer-2.
+ * No shadow token exists in design-platform.css; derive elevation from its scrim.
+ * This final layer supersedes historical glass/classic fallback appearance only.
+ */
+[data-dam-theme][data-dam-theme][data-dam-theme],
+[data-dam-theme][data-dam-theme][data-dam-theme] [data-iter5]{
+  --i5-bg:var(--dsw-alias-bg-base)!important;
+  --i5-surface:var(--dsw-alias-bg-layer-2)!important;
+  --i5-face:var(--dsw-alias-bg-layer-2)!important;
+  --i5-side:var(--dsw-alias-bg-layer-1)!important;
+  --i5-recess:var(--dsw-alias-bg-layer-1)!important;
+  --i5-soft:var(--dsw-alias-interactive-bg-hover-solid)!important;
+  --i5-text:var(--dsw-alias-label-primary)!important;
+  --i5-secondary:var(--dsw-alias-label-secondary)!important;
+  --i5-muted:var(--dsw-alias-label-tertiary)!important;
+  --i5-line:var(--dsw-alias-border-l2)!important;
+  --i5-bezel:var(--dsw-alias-border-l2)!important;
+  --i5-blue:var(--dsw-alias-link)!important;
+  --i5-primary:var(--dsw-alias-button-primary-fill)!important;
+  --i5-on-accent:var(--dsw-alias-label-primary-foreground)!important;
+  color:var(--dsw-alias-label-primary);
+  font-family:var(--dsw-font-family);
+}
+/* Never blur content, including inline legacy styles and nested cards. */
+[data-dam-theme][data-dam-theme][data-dam-theme],
+[data-dam-theme][data-dam-theme][data-dam-theme] *,
+[data-dam-theme][data-dam-theme][data-dam-theme] *::before,
+[data-dam-theme][data-dam-theme][data-dam-theme] *::after{
+  backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+}
+/* Actual content cards, not the transparent theme/positioning boundaries. */
+[data-dam-theme][data-dam-theme][data-dam-theme] :is(
+  [data-dam-panel],[data-dam-tour],[data-dam-status-dialog],[data-native-dialog],
+  [data-dam-autocont],[data-native-continuation],.i5-native-notice,
+  .i5-dialog,.i5-dialog-backdrop>.i5-card,[role=dialog]:not(.i5-dialog-backdrop),
+  [data-dam-calendar-modal],[data-dam-kx-drawer],[data-dam-wbg-side],
+  [data-dam-savebar],[data-i5-embedded][data-expanded=true],
+  .i5-sidebar,.i5-overlay-root>[data-iter5],
+  [role=menu],[role=listbox],[role=tooltip],.i5-popover,.i5-tooltip,.i5-menu){
+  background:var(--dsw-alias-bg-layer-2)!important;
+  background-image:none!important;
+  color:var(--dsw-alias-label-primary)!important;
+  border:1px solid var(--dsw-alias-border-l2)!important;
+  border-radius:var(--dsw-radius-lg)!important;
+  box-shadow:0 12px 40px var(--dsw-alias-bg-mask-1)!important;
+  opacity:1!important;
+}
+[data-dam-theme][data-dam-theme][data-dam-theme] [data-dam-panel]{border-radius:var(--dsw-radius-panel)!important;}
+/* Existing layout and focus mechanics survive; only the material changes. */
+[data-dam-theme][data-dam-theme][data-dam-theme] :is(
+  .i5-card,.i5-panel,[data-dam-card],[data-dam-settings-group],.i5-rail,
+  [data-dam-panel]>header,.i5-quick-actions,.i5-main){
+  background:var(--dsw-alias-bg-layer-2)!important;background-image:none!important;
+  box-shadow:none!important;
+}
+[data-dam-theme][data-dam-theme][data-dam-theme] :is(button,input,select,textarea){
+  background-image:none!important;box-shadow:none!important;border-radius:var(--dsw-radius-sm);
+}
+[data-dam-theme][data-dam-theme][data-dam-theme] :is(
+  .i5-dialog-backdrop,.i5-nav-backdrop,[data-dam-tour-backdrop]){
+  background:var(--dsw-alias-bg-mask-1)!important;background-image:none!important;
+}
+[data-dam-theme][data-dam-theme][data-dam-theme] [data-dam-panel]::before{display:none!important;}
+[data-dam-theme][data-dam-theme][data-dam-theme] :is(.i5-screw,.i5-art,[data-dam-tour-visual]){display:none!important;}

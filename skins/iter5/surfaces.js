@@ -56,7 +56,7 @@
         if (!style) {
           style = document.createElement('style')
           style.id = 'dam-shared-ui-style'
-          style.dataset.plugin = '@a9i5k4/dsh-auto-memory'
+          style.dataset.plugin = 'dsh-personalised'
           style.textContent = ITER5_CSS
           document.head.appendChild(style)
         }

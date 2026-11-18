@@ -158,16 +158,16 @@ The AI calls these itself: `memory_recall`, `memory_read`, `memory_note`, `memor
 
 | What | Path |
 |---|---|
-| Plugin config | `~/.dsh/dsh-auto-memory.json` |
+| Plugin config | `~/.dsh/dsh-personalised.json` (initially migrated from the old config) |
 | Profile store | `~/.dsh/memory/personal/profile.json` |
 | Import backups | `~/.dsh/memory/personal/backups/` |
 | User-level memory | `~/.dsh/memory/MEMORY.md` |
 | Workspace memory | `~/.dsh/memory/workspaces/<workspace>/` |
 | Memory hub | `~/.dsh/memory/hub/` |
 | Evidence events | `~/.dsh/memory/evidence/events/` |
-| Diagnostic log | `~/.dsh/dsh-auto-memory-diagnose.log` (next to `memory/`, not inside) |
+| Diagnostic log | `~/.dsh/dsh-personalised-diagnose.log` (next to `memory/`, not inside) |
 
-If `DSH_HOME` is set, the actual host data root applies. Everything stays on your machine. Paths keep the old names so existing dsh-auto-memory users keep their data.
+If `DSH_HOME` is set, the actual host data root applies. Config is copied during migration; memory directories stay in place. Read the [migration guide](MIGRATION.md#english) before upgrading, moving machines or rolling back. npm `1.0.0` still uses the legacy config path; the new paths require a version containing this update.
 
 ## 7. Troubleshooting
 

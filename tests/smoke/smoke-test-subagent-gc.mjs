@@ -69,7 +69,7 @@ try {
   // ── G1/G12 解码与头部解析 ────────────────────────────────
   const oneShotDir = await makeSession(root, WS, 'aaaa1111-0000-0000-0000-000000000001', [
     subHeader('aaaa1111-0000-0000-0000-000000000001', 'session-parent-1'),
-    descriptor('auto-memory-summarize', 'one-shot'),
+    descriptor('personalised-summarize', 'one-shot'),
     { type: 'assistant/message', data: { text: 'hi' } },
   ])
   const raw = await readFile(path.join(oneShotDir, 'session.jsonl.zstd'))
@@ -78,7 +78,7 @@ try {
   const text = decodeZstdFrames(raw)
   const head = parseSessionHead(text)
   ok('G1 header 解析出 origin=subagent', head.header && head.header.origin === 'subagent')
-  ok('G1 descriptor 解析出 label/mode', head.descriptor && head.descriptor.label === 'auto-memory-summarize' && head.descriptor.mode === 'one-shot')
+  ok('G1 descriptor 解析出 label/mode', head.descriptor && head.descriptor.label === 'personalised-summarize' && head.descriptor.mode === 'one-shot')
   ok('G12 解析在 header+descriptor 齐备后提前退出(事件计数=2)', head.eventCount === 2, 'got=' + head.eventCount)
 
   // ── G13 头帧解码(PR #29,2026-09-13):扫描路径禁止全量解压 ──
@@ -93,20 +93,20 @@ try {
     ok('G13 第 1 帧就是 session header', ev1.type === 'session')
     const head2 = decodeZstdFramesHead(raw, 2)
     const h2 = parseSessionHead(head2)
-    ok('G13 maxFrames=2 已够扫描判定(header+descriptor 齐备)', h2.header && h2.descriptor && h2.descriptor.label === 'auto-memory-summarize')
+    ok('G13 maxFrames=2 已够扫描判定(header+descriptor 齐备)', h2.header && h2.descriptor && h2.descriptor.label === 'personalised-summarize')
   }
 
   // ── G2-G7 判据 ──────────────────────────────────────────
   const base = { labelPrefix: PLUGIN_LABEL_PREFIX, keepMs: 0, now: Date.now(), mtimeMs: 1 }
   ok('G2 插件 one-shot 子代理 → hit', isPluginOneShotSubagent(head, base).hit === true)
   ok('G3 continuable 子代理不回收', isPluginOneShotSubagent(
-    { header: head.header, descriptor: descriptor('auto-memory-summarize', 'continuable') }, base).hit === false)
+    { header: head.header, descriptor: descriptor('personalised-summarize', 'continuable') }, base).hit === false)
   ok('G4 非插件 label 不回收', isPluginOneShotSubagent(
     { header: head.header, descriptor: descriptor('Research official Mem0 sources', 'one-shot') }, base).hit === false)
   ok('G5 普通会话不回收', isPluginOneShotSubagent(
-    { header: plainHeader('session-x'), descriptor: descriptor('auto-memory-summarize', 'one-shot') }, base).hit === false)
+    { header: plainHeader('session-x'), descriptor: descriptor('personalised-summarize', 'one-shot') }, base).hit === false)
   ok('G6 缺 parentSession 不回收', isPluginOneShotSubagent(
-    { header: { ...subHeader('s', undefined) }, descriptor: descriptor('auto-memory-consolidate', 'one-shot') }, base).hit === false)
+    { header: { ...subHeader('s', undefined) }, descriptor: descriptor('personalised-consolidate', 'one-shot') }, base).hit === false)
   ok('G7 太新的不回收', isPluginOneShotSubagent(head, {
     labelPrefix: PLUGIN_LABEL_PREFIX, keepMs: 60 * 60 * 1000, now: 1000 + 60 * 1000, mtimeMs: 1000,
   }).hit === false)
@@ -114,11 +114,11 @@ try {
   // ── 构造扫描语料 ────────────────────────────────────────
   await makeSession(root, WS, 'bbbb2222-0000-0000-0000-000000000002', [
     subHeader('bbbb2222-0000-0000-0000-000000000002', 'session-parent-1'),
-    descriptor('auto-memory-consolidate', 'one-shot'),
+    descriptor('personalised-consolidate', 'one-shot'),
   ])
   await makeSession(root, WS, 'cccc3333-0000-0000-0000-000000000003', [
     subHeader('cccc3333-0000-0000-0000-000000000003', 'session-parent-1'),
-    descriptor('auto-memory-summarize', 'continuable'),
+    descriptor('personalised-summarize', 'continuable'),
   ])
   await makeSession(root, WS, 'dddd4444-0000-0000-0000-000000000004', [
     subHeader('dddd4444-0000-0000-0000-000000000004', 'session-parent-1'),

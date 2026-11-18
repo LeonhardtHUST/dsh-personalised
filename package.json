@@ -1,6 +1,6 @@
 {
   "name": "dsh-personalised",
-  "description": "Personalisation for DeepSeek Harness: stable custom system instructions, relevance-based personal memory, workspace-scoped project memory, and one-click memory import/export across AI platforms. Built on the dsh-auto-memory engine. DeepSeek Harness 个性化：稳定的自定义系统指令、按相关性注入的个人记忆、按工作区隔离的项目记忆，以及跨 AI 平台的记忆导入导出。",
+  "description": "Personalisation for DeepSeek Harness: stable custom system instructions, relevance-based personal memory, workspace-scoped project memory, and one-click memory import/export across AI platforms. DeepSeek Harness 个性化：稳定的自定义系统指令、按相关性注入的个人记忆、按工作区隔离的项目记忆，以及跨 AI 平台的记忆导入导出。",
   "version": "1.0.0",
   "packageManager": "pnpm@12.21.0",
   "engines": {
